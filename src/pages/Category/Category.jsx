@@ -41,6 +41,7 @@ import {
     useToast,
     CircularProgress,
     CircularProgressLabel,
+    Textarea,
   } from "@chakra-ui/react";
   import {
     AiOutlinePlus,
@@ -91,10 +92,7 @@ import { baseURL } from "../../urlserver.js";
 
 
   
-    const [delId, setDelId] = useState();
-    const deleter = () => {
-      dispatch(deleteProducts(delId));
-    };
+   
   
     const [currentPage, setCurrentPage] = useState(1);
     const [postsPerPage] = useState(8);
@@ -156,17 +154,80 @@ import { baseURL } from "../../urlserver.js";
     const toast = useToast();
 
  
+  //get genres
   const [categories, setCategories] = useState([]);
 
   useEffect(()=> {
     const fetchCategory = async () => {
-      const {data} = await axios.get(`${baseURL}danhmuc`);
+      const {data} = await axios.get(`${baseURL}genres/get-all`);
       setCategories(data);
       setIsLoading(false);
     };
     fetchCategory();
   },[]);
   console.log(categories)
+
+// add new genres
+const [genreName, setGenreName] = useState("");
+const [description, setDescription] = useState("");
+console.log(genreName, description)
+const handleCreateNewGenre = async ()=> {
+
+    await axios.post(`${baseURL}category/add-new`, {
+      genreName,
+      description,
+    },
+    {
+      headers: {
+      "Content-Type":"application/json",
+      Accept: 'application/json',
+  }
+    })
+    .then((response) => {
+      console.log(response);
+    });
+    setGenreName("")
+    setDescription("");
+  };
+
+  //update genre
+  const handleUpdateGenre = async () => {
+    await axios.put(`${baseURL}category/update`, {
+      genreName,
+      description,
+      genreID: modalData.genreID,
+    },
+    {
+      headers: {
+      "Content-Type":"application/json",
+      Accept: 'application/json',
+  }
+    })
+    .then((response) => {
+      console.log(response);
+    });
+
+    setGenreName("")
+    setDescription("");
+  }
+
+
+  const [delId, setDelId] = useState(null);
+  console.log(delId)
+  const handleDeleteGenre = async () => {
+    await axios.delete(`${baseURL}category/delete/${delId}`, {
+      genreID: delId,
+    },
+    {
+      headers: {
+      "Content-Type":"application/json",
+      Accept: 'application/json',
+  }
+    })
+    .then((response) => {
+      console.log(response);
+    });
+  }
 
 
 
@@ -199,7 +260,7 @@ import { baseURL } from "../../urlserver.js";
                     colorScheme="yellow"
                     onClick={() => {
                       onClose();
-                      deleter();
+                      handleDeleteGenre();
                     }}
                     ml={3}
                   >
@@ -215,14 +276,7 @@ import { baseURL } from "../../urlserver.js";
               <ModalHeader>{modalData.name}</ModalHeader>
               <ModalCloseButton />
               <ModalBody>
-                <Image
-                  w="150px"
-                  h="150px"
-                  m="0 auto"
-                  objectFit="cover"
-                  rounded="lg"
-                  src={modalData.image}
-                />
+               
                 <Formik
                   initialValues={{
                     id: `${modalData.id}`,
@@ -237,11 +291,10 @@ import { baseURL } from "../../urlserver.js";
                   }}
                   onSubmit={(values, actions) => {
                     setTimeout(() => {
-                      dispatch(patchProducts(values));
-                      actions.setSubmitting(false);
+                     handleUpdateGenre();
                       onClosed();
                       toast({
-                        title: `"${values.name}" is updated`,
+                        title: `Thể loại "${genreName}" is updated`,
                         status: "success",
                         duration: 7000,
                         isClosable: true,
@@ -253,212 +306,61 @@ import { baseURL } from "../../urlserver.js";
                   {(props) => (
                     <Form>
                       <SimpleGrid
-                        minChildWidth="160px"
+                        minChildWidth="250px"
                         spacingY={3}
                         spacingX={10}
                         mt={3}
                       >
-                        <Field name="id" validate={validate}>
-                          {({ field, form }) => (
-                            <FormControl
-                              isInvalid={form.errors.id && form.touched.id}
+                         <Field name="name" >
+                        {({ field, form }) => (
+                          <FormControl
+                            isInvalid={form.errors.name && form.touched.name}
+                          >
+                            <FormLabel
+                              fontSize={{ base: "sm", md: "md", lg: "lg" }}
                             >
-                              <FormLabel
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              >
-                                ID:
-                              </FormLabel>
-                              <Input
-                                type="number"
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                                isDisabled
-                                {...field}
-                                placeholder="ID"
-                              />
-                              <FormErrorMessage>
-                                {form.errors.id}
-                              </FormErrorMessage>
-                            </FormControl>
-                          )}
-                        </Field>
-                        <Field name="name" validate={validate}>
-                          {({ field, form }) => (
-                            <FormControl
-                              isInvalid={form.errors.name && form.touched.name}
+                              Name:
+                            </FormLabel>
+                            <Input
+                            onChange={(e)=> setGenreName(e.target.value)}
+                            value={genreName}
+                              type="text"
+                              fontSize={{ base: "sm", md: "md", lg: "lg" }}
+                              placeholder={modalData.genreName}
+                            />
+                            <FormErrorMessage>
+                              {form.errors.name}
+                            </FormErrorMessage>
+                          </FormControl>
+                        )}
+                      </Field>
+                   
+                        <Field name="description">
+                        {({ field, form }) => (
+                          <FormControl
+                            isInvalid={form.errors.color && form.touched.color}
+                          >
+                            <FormLabel
+                              fontSize={{ base: "sm", md: "md", lg: "lg" }}
                             >
-                              <FormLabel
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              >
-                                Name:
-                              </FormLabel>
-                              <Input
-                                {...field}
-                                type="text"
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                                placeholder="Name"
-                              />
-                              <FormErrorMessage>
-                                {form.errors.name}
-                              </FormErrorMessage>
-                            </FormControl>
-                          )}
-                        </Field>
-                        <Field name="price" validate={validate}>
-                          {({ field, form }) => (
-                            <FormControl
-                              isInvalid={form.errors.price && form.touched.price}
-                            >
-                              <FormLabel
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              >
-                                Price:
-                              </FormLabel>
-                              <Input
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                                type="number"
-                                {...field}
-                                placeholder="Price"
-                              />
-                              <FormErrorMessage>
-                                {form.errors.price}
-                              </FormErrorMessage>
-                            </FormControl>
-                          )}
-                        </Field>
-                        <Field name="date" validate={validate}>
-                          {({ field, form }) => (
-                            <FormControl
-                              isInvalid={form.errors.date && form.touched.date}
-                            >
-                              <FormLabel
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              >
-                                Date:
-                              </FormLabel>
-                              <Input
-                                {...field}
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                                type="text"
-                                placeholder="Date"
-                              />
-                              <FormErrorMessage>
-                                {form.errors.date}
-                              </FormErrorMessage>
-                            </FormControl>
-                          )}
-                        </Field>
-                        <Field name="os" validate={validate}>
-                          {({ field, form }) => (
-                            <FormControl
-                              isInvalid={form.errors.os && form.touched.os}
-                            >
-                              <FormLabel
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              >
-                                OS:
-                              </FormLabel>
-                              <Input
-                                {...field}
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                                type="text"
-                                placeholder="OS"
-                              />
-                              <FormErrorMessage>
-                                {form.errors.os}
-                              </FormErrorMessage>
-                            </FormControl>
-                          )}
-                        </Field>
-                        <Field name="cpu" validate={validate}>
-                          {({ field, form }) => (
-                            <FormControl
-                              isInvalid={form.errors.cpu && form.touched.cpu}
-                            >
-                              <FormLabel
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              >
-                                CPU:
-                              </FormLabel>
-                              <Input
-                                {...field}
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                                type="text"
-                                placeholder="CPU"
-                              />
-                              <FormErrorMessage>
-                                {form.errors.cpu}
-                              </FormErrorMessage>
-                            </FormControl>
-                          )}
-                        </Field>
-                        <Field name="gpu" validate={validate}>
-                          {({ field, form }) => (
-                            <FormControl
-                              isInvalid={form.errors.gpu && form.touched.gpu}
-                            >
-                              <FormLabel
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              >
-                                GPU:
-                              </FormLabel>
-                              <Input
-                                {...field}
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                                type="text"
-                                placeholder="GPU"
-                              />
-                              <FormErrorMessage>
-                                {form.errors.gpu}
-                              </FormErrorMessage>
-                            </FormControl>
-                          )}
-                        </Field>
-                        <Field name="storage" validate={validate}>
-                          {({ field, form }) => (
-                            <FormControl
-                              isInvalid={
-                                form.errors.storage && form.touched.storage
-                              }
-                            >
-                              <FormLabel
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              >
-                                Storage:
-                              </FormLabel>
-                              <Input
-                                {...field}
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                                type="text"
-                                placeholder="Storage"
-                              />
-                              <FormErrorMessage>
-                                {form.errors.storage}
-                              </FormErrorMessage>
-                            </FormControl>
-                          )}
-                        </Field>
-                        <Field name="color" validate={validate}>
-                          {({ field, form }) => (
-                            <FormControl
-                              isInvalid={form.errors.color && form.touched.color}
-                            >
-                              <FormLabel
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              >
-                                Color:
-                              </FormLabel>
-                              <Input
-                                {...field}
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                                type="text"
-                                placeholder="Color"
-                              />
-                              <FormErrorMessage>
-                                {form.errors.color}
-                              </FormErrorMessage>
-                            </FormControl>
-                          )}
-                        </Field>
+                              Description:
+                            </FormLabel>
+                              <Textarea
+                                      // value={value}
+                                      // onChange={handleInputChange}
+                                      placeholder={modalData.description}
+                                      
+                                      fontSize={{ base: "sm", md: "md", lg: "lg" }}
+                                      onChange={(e)=> setDescription(e.target.value)}
+                                      value={description}
+                                    />
+                       
+                            <FormErrorMessage>
+                              {form.errors.color}
+                            </FormErrorMessage>
+                          </FormControl>
+                        )}
+                      </Field>
                       </SimpleGrid>
                       <Button
                         mt={4}
@@ -466,11 +368,10 @@ import { baseURL } from "../../urlserver.js";
                         isLoading={props.isSubmitting}
                         type="submit"
                         fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                        w="130px"
                         display="block"
                         margin="30px auto 10px auto"
                       >
-                        Submit
+                        Update Genres
                       </Button>
                     </Form>
                   )}
@@ -481,44 +382,11 @@ import { baseURL } from "../../urlserver.js";
           <Modal isOpen={isOpenModal} size="xl" onClose={onCloseModal}>
             <ModalOverlay />
             <ModalContent>
-              <ModalHeader>Add New Item</ModalHeader>
+              <ModalHeader>Add New Genres</ModalHeader>
               <ModalCloseButton />
               <ModalBody>
-                {imgUrl.length > 0 ? (
-                  <Image
-                    w="150px"
-                    h="150px"
-                    m="0 auto"
-                    objectFit="cover"
-                    rounded="lg"
-                    src={imgUrl}
-                  />
-                ) : null}
-                <HStack spacing={3} paddingY={3}>
-                  <Button as="label" cursor="pointer" htmlFor="uploadIMG">
-                    Choose Image
-                  </Button>
-                  <CircularProgress
-                    value={progresspercent}
-                    size="40px"
-                    color="teal.400"
-                  >
-                    <CircularProgressLabel>
-                      {progresspercent}%
-                    </CircularProgressLabel>
-                  </CircularProgress>
-                  <Input
-                    onChange={imgUpload}
-                    id="uploadIMG"
-                    type="file"
-                    pointerEvents="none"
-                    position="absolute"
-                    visibility="hidden"
-                    zIndex="-333"
-                    opacity="0"
-                    accept="image/*"
-                  />
-                </HStack>
+               
+             
                 <Formik
                   enableReinitialize={true}
                   initialValues={{
@@ -536,11 +404,11 @@ import { baseURL } from "../../urlserver.js";
                   }}
                   onSubmit={(values, actions) => {
                     setTimeout(() => {
-                      dispatch(addProducts(values));
-                      actions.setSubmitting(false);
+
+                     handleCreateNewGenre();
                       onCloseModal();
                       toast({
-                        title: `"${values.name}" is created`,
+                        title: `Thể loại "${genreName}" is created`,
                         status: "success",
                         duration: 5000,
                         isClosable: true,
@@ -552,256 +420,64 @@ import { baseURL } from "../../urlserver.js";
                   {(props) => (
                     <Form>
                       <SimpleGrid
-                        minChildWidth="200px"
+                        minChildWidth="250px"
                         spacingY={3}
                         spacingX={10}
                         mt={3}
                       >
-                        <Field name="id" validate={validate}>
-                          {({ field, form }) => (
-                            <FormControl
-                              isInvalid={form.errors.id && form.touched.id}
+                     
+                     <Field name="name" >
+                        {({ field, form }) => (
+                          <FormControl
+                            isInvalid={form.errors.name && form.touched.name}
+                          >
+                            <FormLabel
+                              fontSize={{ base: "sm", md: "md", lg: "lg" }}
                             >
-                              <FormLabel
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              >
-                                ID:
-                              </FormLabel>
-                              <Input
-                                type="number"
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                                isDisabled
-                                {...field}
-                                placeholder="ID"
-                              />
-                              <FormErrorMessage>
-                                {form.errors.id}
-                              </FormErrorMessage>
-                            </FormControl>
-                          )}
-                        </Field>
-                        <Field name="name" validate={validate}>
-                          {({ field, form }) => (
-                            <FormControl
-                              isInvalid={form.errors.name && form.touched.name}
+                              Name:
+                            </FormLabel>
+                            <Input
+                            onChange={(e)=> setGenreName(e.target.value)}
+                            value={genreName}
+                              type="text"
+                              fontSize={{ base: "sm", md: "md", lg: "lg" }}
+                              placeholder="Name"
+                            />
+                            <FormErrorMessage>
+                              {form.errors.name}
+                            </FormErrorMessage>
+                          </FormControl>
+                        )}
+                      </Field>
+                   
+                        <Field name="description">
+                        {({ field, form }) => (
+                          <FormControl
+                            isInvalid={form.errors.color && form.touched.color}
+                          >
+                            <FormLabel
+                              fontSize={{ base: "sm", md: "md", lg: "lg" }}
                             >
-                              <FormLabel
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              >
-                                Name:
-                              </FormLabel>
-                              <Input
-                                {...field}
-                                type="text"
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                                placeholder="Name"
-                              />
-                              <FormErrorMessage>
-                                {form.errors.name}
-                              </FormErrorMessage>
-                            </FormControl>
-                          )}
-                        </Field>
-                        <Field name="category" validate={validate}>
-                          {({ field, form }) => (
-                            <FormControl
-                              isInvalid={
-                                form.errors.category && form.touched.category
-                              }
-                            >
-                              <FormLabel
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              >
-                                Category:
-                              </FormLabel>
-                              <RadioGroup
-                                onChange={setValue}
-                                name="category"
-                                value={value}
-                              >
-                                <Stack direction="row" {...field}>
-                                  <Radio
-                                    size={{ base: "sm", md: "md" }}
-                                    value="phone"
-                                  >
-                                    Phone
-                                  </Radio>
-                                  <Radio
-                                    size={{ base: "sm", md: "md" }}
-                                    value="laptop"
-                                  >
-                                    Laptop
-                                  </Radio>
-                                  <Radio
-                                    size={{ base: "sm", md: "md" }}
-                                    value="Desktop"
-                                  >
-                                    Desktop
-                                  </Radio>
-                                </Stack>
-                              </RadioGroup>
-                              <FormErrorMessage>
-                                {form.errors.category}
-                              </FormErrorMessage>
-                            </FormControl>
-                          )}
-                        </Field>
-                        <Field name="price" validate={validate}>
-                          {({ field, form }) => (
-                            <FormControl
-                              isInvalid={form.errors.price && form.touched.price}
-                            >
-                              <FormLabel
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              >
-                                Price:
-                              </FormLabel>
-                              <Input
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                                type="number"
-                                {...field}
-                                placeholder="Price"
-                              />
-                              <FormErrorMessage>
-                                {form.errors.price}
-                              </FormErrorMessage>
-                            </FormControl>
-                          )}
-                        </Field>
-                        <Field name="date" validate={validate}>
-                          {({ field, form }) => (
-                            <FormControl
-                              isInvalid={form.errors.date && form.touched.date}
-                            >
-                              <FormLabel
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              >
-                                Date:
-                              </FormLabel>
-                              <Input
-                                {...field}
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                                type="text"
-                                placeholder="Date"
-                              />
-                              <FormErrorMessage>
-                                {form.errors.date}
-                              </FormErrorMessage>
-                            </FormControl>
-                          )}
-                        </Field>
-                        <Field name="os" validate={validate}>
-                          {({ field, form }) => (
-                            <FormControl
-                              isInvalid={form.errors.os && form.touched.os}
-                            >
-                              <FormLabel
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              >
-                                OS:
-                              </FormLabel>
-                              <Input
-                                {...field}
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                                type="text"
-                                placeholder="OS"
-                              />
-                              <FormErrorMessage>
-                                {form.errors.os}
-                              </FormErrorMessage>
-                            </FormControl>
-                          )}
-                        </Field>
-                        <Field name="cpu" validate={validate}>
-                          {({ field, form }) => (
-                            <FormControl
-                              isInvalid={form.errors.cpu && form.touched.cpu}
-                            >
-                              <FormLabel
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              >
-                                CPU:
-                              </FormLabel>
-                              <Input
-                                {...field}
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                                type="text"
-                                placeholder="CPU"
-                              />
-                              <FormErrorMessage>
-                                {form.errors.cpu}
-                              </FormErrorMessage>
-                            </FormControl>
-                          )}
-                        </Field>
-                        <Field name="gpu" validate={validate}>
-                          {({ field, form }) => (
-                            <FormControl
-                              isInvalid={form.errors.gpu && form.touched.gpu}
-                            >
-                              <FormLabel
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              >
-                                GPU:
-                              </FormLabel>
-                              <Input
-                                {...field}
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                                type="text"
-                                placeholder="GPU"
-                              />
-                              <FormErrorMessage>
-                                {form.errors.gpu}
-                              </FormErrorMessage>
-                            </FormControl>
-                          )}
-                        </Field>
-                        <Field name="storage" validate={validate}>
-                          {({ field, form }) => (
-                            <FormControl
-                              isInvalid={
-                                form.errors.storage && form.touched.storage
-                              }
-                            >
-                              <FormLabel
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              >
-                                Storage:
-                              </FormLabel>
-                              <Input
-                                {...field}
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                                type="text"
-                                placeholder="Storage"
-                              />
-                              <FormErrorMessage>
-                                {form.errors.storage}
-                              </FormErrorMessage>
-                            </FormControl>
-                          )}
-                        </Field>
-                        <Field name="color" validate={validate}>
-                          {({ field, form }) => (
-                            <FormControl
-                              isInvalid={form.errors.color && form.touched.color}
-                            >
-                              <FormLabel
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              >
-                                Color:
-                              </FormLabel>
-                              <Input
-                                {...field}
-                                fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                                type="text"
-                                placeholder="Color"
-                              />
-                              <FormErrorMessage>
-                                {form.errors.color}
-                              </FormErrorMessage>
-                            </FormControl>
-                          )}
-                        </Field>
+                              Description:
+                            </FormLabel>
+                              <Textarea
+                                      // value={value}
+                                      // onChange={handleInputChange}
+                                      placeholder="Description"
+                                      
+                                      fontSize={{ base: "sm", md: "md", lg: "lg" }}
+                                      onChange={(e)=> setDescription(e.target.value)}
+                                      value={description}
+                                    />
+                       
+                            <FormErrorMessage>
+                              {form.errors.color}
+                            </FormErrorMessage>
+                          </FormControl>
+                        )}
+                      </Field>
+                    
+                     
                       </SimpleGrid>
                       <Button
                         mt={4}
@@ -809,11 +485,11 @@ import { baseURL } from "../../urlserver.js";
                         isLoading={props.isSubmitting}
                         type="submit"
                         fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                        w="130px"
+                       
                         display="block"
                         margin="30px auto 10px auto"
                       >
-                        Submit
+                        Add New Genre
                       </Button>
                     </Form>
                   )}
@@ -840,7 +516,7 @@ import { baseURL } from "../../urlserver.js";
                   leftIcon={<Icon fontSize="lg" as={AiOutlinePlus} />}
                   colorScheme="green"
                 >
-                  New Item
+                  New Genre
                 </Button>
                 <Button
                   p={2}
@@ -877,7 +553,7 @@ import { baseURL } from "../../urlserver.js";
                     <Tr>
                       <Th>MaDanhMuc</Th>
                       <Th>TenDanhMuc</Th>
-                      
+                      <Th>Description</Th>
                       <Th textAlign="center">Edit</Th>
                     </Tr>
                   </Thead>
@@ -888,11 +564,13 @@ import { baseURL } from "../../urlserver.js";
                             ""
                           ) : (
                             <Tr key={category.id}>
-                              <Td w="300px">{category.MaDanhMuc}</Td>
+                              <Td w="300px">{category.genreID}</Td>
                               <Td minW="200px">
-                              {category.TenDanhMuc}
+                              {category.genreName}
                               </Td>
-                             
+                              <Td minW="300px">
+                              {category.description}
+                              </Td>
                              
                               <Td w="60px">
                                 <HStack spacing={8}>
@@ -910,7 +588,7 @@ import { baseURL } from "../../urlserver.js";
                                   <IconButton
                                     onClick={() => {
                                       onOpen();
-                                      setDelId((prevv) => (prevv = category.id));
+                                      setDelId(category.genreID);
                                     }}
                                     colorScheme="yellow"
                                     aria-label="Delete"

@@ -1,4 +1,4 @@
-import { AiOutlineHome,AiOutlineTags,AiOutlineAppstoreAdd,AiOutlineAudit,AiOutlineQuestionCircle, AiFillBook,  } from "react-icons/ai";
+import { AiOutlineHome,AiOutlineTags,AiOutlineAppstoreAdd,AiOutlineAudit,AiOutlineQuestionCircle, AiFillBook, AiFillIdcard } from "react-icons/ai";
 import { BiCategoryAlt } from "react-icons/bi";
 import { BsBook } from "react-icons/bs";
 import { MdOutlineCategory } from "react-icons/md";
@@ -37,6 +37,12 @@ export const NavData = [
   },
   {
     id:5,
+    name:"Borrowing",
+    icon:AiFillIdcard,
+    page:"borrowing"
+  },
+  {
+    id:6,
     name:"Employees",
     icon:ImUserTie,
     page:"employees"
