@@ -42,7 +42,6 @@ import {
   CircularProgress,
   CircularProgressLabel,
   Textarea,
-  Select,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
@@ -72,11 +71,13 @@ import { storage } from "../../firebase/Firebase.jsx";
 import { memo } from "react";
 import axios from "axios";
 import { baseURL } from "../../urlserver.js";
-import { useNavigate, useNavigation } from "react-router-dom";
-const Products = () => {
+const BorrowBook = () => {
+
+
   const dispatch = useDispatch();
   const filteredData = useSelector((state) => state.products.products);
   const productList = filteredData.filter((filtered) => filtered !== null);
+  // const isLoading = useSelector((state) => state.products.isLoading);
   const [isLoading, setIsLoading] = useState(true);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
@@ -93,6 +94,9 @@ const Products = () => {
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
+
+
+
 
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -121,32 +125,10 @@ const Products = () => {
 
   const [imgUrl, setImgUrl] = useState("");
   const [progresspercent, setProgresspercent] = useState(0);
-  const imgUpload = (e) => {
-    const file = e.target.files[0];
+  const imgUpload = (ee) => {
+    const file = ee.target.files[0];
     if (!file) return;
-    // const storageRef = ref(storage, `${file.name}`);
 
-    // console.log(file.name)
-    // const uploadTask = uploadBytesResumable(storageRef, file);
-    // uploadTask.on(
-    //   "state_changed",
-    //   (snapshot) => {
-    //     const progress = Math.round(
-    //       (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-    //     );
-    //     setProgresspercent(progress);
-    //   },
-    //   (error) => {
-    //     alert(error);
-    //   },
-    //   () => {
-    //     getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-    //       setImgUrl((url) => (url = downloadURL));
-    //     });
-    //   }
-    // );
-    console.log(file.name)
-    setImageName(file.name)
   };
   function validate(value) {
     let error;
@@ -155,36 +137,30 @@ const Products = () => {
     }
     return error;
   }
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState("phone");
   const toast = useToast();
 
 
-  const [books, setBooks] = useState([]);
-
-  const [imageName, setImageName] = useState("")
-  const [bookName, setBookName] = useState("");
-  const [genreName, setGenreName] = useState("");
-  const [authorName, setAuthorName] = useState("");
-  const [language, setLanguage] = useState("");
-  const [quantity, setQuantity] = useState(0);
-  const [price, setPrice] = useState(0);
-  const [description, setDescription] = useState("");
 
   const [count, setCount] = useState(1);
+
+  const [borrowing, setBorrowing] = useState([]);
+
   useEffect(() => {
-    const fetchBooks = async () => {
-      const { data } = await axios.get(`${baseURL}books/get-all`);
-      setBooks(data);
+    const fetchBorrowing = async () => {
+      const { data } = await axios.get(`${baseURL}borrowing/get-all`);
+      setBorrowing(data);
       setIsLoading(false);
     };
-    fetchBooks();
+    fetchBorrowing();
   }, [count]);
-  console.log(books)
+  console.log(borrowing)
 
   const [delId, setDelId] = useState();
-  const handleDeleteBook = async () => {
-    await axios.delete(`${baseURL}book/delete/${delId}`, {
-      bookID: delId,
+  // handle delete borrowing
+  const handleDeleteBorrowing = async () => {
+    await axios.delete(`${baseURL}borrowing/delete/${delId}`, {
+      borrowID: delId,
     },
       {
         headers: {
@@ -198,33 +174,21 @@ const Products = () => {
     setCount(count + 1);
   };
 
-  //get genres
-  const [categories, setCategories] = useState([]);
+  // handle add new borrowing
+  const [studentName, setStudentName] = useState("")
+  const [bookName, setBookName] = useState("");
+  const [borrowDate, setBorrowDate] = useState("");
+  const [returnDate, setReturnDate] = useState("");
+  const [quantity, setQuantity] = useState(0);
 
-  useEffect(() => {
-    const fetchCategory = async () => {
-      const { data } = await axios.get(`${baseURL}genres/get-all`);
-      setCategories(data);
-      setIsLoading(false);
-    };
-    fetchCategory();
-  }, []);
-  console.log(categories)
+  const handleAddNewBorrowing = async () => {
 
-  //handle add new book
-
-  console.log(bookName, genreName, authorName, language, quantity, price, description)
-  const handleCreateNewBook = async () => {
-
-    await axios.post(`${baseURL}book/add-new`, {
+    await axios.post(`${baseURL}borrowing/add-new`, {
+      studentName,
       bookName,
-      genreName,
-      authorName,
+      borrowDate,
+      returnDate,
       quantity,
-      price,
-      language,
-      description,
-      imageName,
     },
       {
         headers: {
@@ -235,44 +199,38 @@ const Products = () => {
       .then((response) => {
         console.log(response);
       });
-    setBookName("");
-    setAuthorName("");
-    setGenreName("");
-    setQuantity("");
-    setPrice("");
-    setLanguage("");
-    setDescription("");
+    setStudentName("")
+    setBookName("")
+    setBorrowDate("")
+    setReturnDate("")
+    setQuantity(0)
     setCount(count + 1);
   };
 
-  console.log(modalData.bookID);
+
+  console.log(modalData.borrowID);
   useEffect(() => {
-    if (modalData.bookID) {
-      setBookName(modalData.bookName);
-      setAuthorName(modalData.authorName);
-      setGenreName(modalData.genreName);
-      setQuantity(modalData.quantity);
-      setPrice(modalData.price);
-      setLanguage(modalData.language);
-      setDescription(modalData.description);
+    if (modalData.borrowID) {
+      setStudentName(modalData.studentName)
+      setBookName(modalData.bookName)
+      setBorrowDate(modalData.borrowDate)
+      setReturnDate(modalData.returnDate)
+      setQuantity(modalData.quantity)
     }
 
   }, [modalData]);
 
 
-  //handle update book
-  const handleUpdateBook = async () => {
+  //handle update borrow
+  const handleUpdateBorrowing = async () => {
 
-    await axios.put(`${baseURL}book/update`, {
+    await axios.put(`${baseURL}borrowing/update`, {
+      studentName,
       bookName,
-      genreName,
-      authorName,
+      borrowDate,
+      returnDate,
       quantity,
-      price,
-      language,
-      description,
-      imageName,
-      bookID: modalData.bookID,
+      borrowID: modalData.borrowID,
     },
       {
         headers: {
@@ -283,21 +241,11 @@ const Products = () => {
       .then((response) => {
         console.log(response);
       });
-    setBookName("");
-    setAuthorName("");
-    setGenreName("");
-    setQuantity("");
-    setPrice("");
-    setLanguage("");
-    setDescription("");
-
-
-    // window.location.reload(true)
-    // // eslint-disable-next-line react-hooks/rules-of-hooks
-    // const navigate = useNavigate();
-
-    //   navigate('/products')
-
+    setStudentName("");
+    setBookName("")
+    setBorrowDate("")
+    setReturnDate("")
+    setQuantity(0)
     setCount(count + 1);
   }
 
@@ -305,7 +253,6 @@ const Products = () => {
 
   return (
     <Box minH="90vh" my={5}>
-
       <Container maxW="full">
         <AlertDialog
           isOpen={isOpen}
@@ -333,7 +280,7 @@ const Products = () => {
                   colorScheme="yellow"
                   onClick={() => {
                     onClose();
-                    handleDeleteBook();
+                    handleDeleteBorrowing();
                   }}
                   ml={3}
                 >
@@ -355,26 +302,8 @@ const Products = () => {
                 m="0 auto"
                 objectFit="cover"
                 rounded="lg"
-                src={`../src/assets/books/${modalData.imageName}`}
+                src={modalData.image}
               />
-              <HStack spacing={3} paddingY={3}>
-                <Button as="label" cursor="pointer" htmlFor="uploadIMG">
-                  Choose Image
-                </Button>
-
-                <Text>{imageName}</Text>
-                <Input
-                  onChange={imgUpload}
-                  id="uploadIMG"
-                  type="file"
-                  pointerEvents="none"
-                  position="absolute"
-                  visibility="hidden"
-                  zIndex="-333"
-                  opacity="0"
-                  accept="image/*"
-                />
-              </HStack>
               <Formik
                 initialValues={{
                   id: `${modalData.id}`,
@@ -389,10 +318,10 @@ const Products = () => {
                 }}
                 onSubmit={(values, actions) => {
                   setTimeout(() => {
-                    handleUpdateBook();
+                    handleUpdateBorrowing();
                     onClosed();
                     toast({
-                      title: `"${modalData.bookName}" is updated`,
+                      title: `"${modalData.studentName}" is updated`,
                       status: "success",
                       duration: 7000,
                       isClosable: true,
@@ -404,12 +333,12 @@ const Products = () => {
                 {(props) => (
                   <Form>
                     <SimpleGrid
-                      minChildWidth="250px"
+                      minChildWidth="160px"
                       spacingY={3}
                       spacingX={10}
                       mt={3}
                     >
-                      <Field name="name" >
+                      <Field name="studentName">
                         {({ field, form }) => (
                           <FormControl
                             isInvalid={form.errors.name && form.touched.name}
@@ -417,15 +346,14 @@ const Products = () => {
                             <FormLabel
                               fontSize={{ base: "sm", md: "md", lg: "lg" }}
                             >
-                              Name:
+                              studentName:
                             </FormLabel>
                             <Input
-
+                              value={studentName}
+                              onChange={e => setStudentName(e.target.value)}
                               type="text"
                               fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              placeholder="Name"
-                              value={bookName}
-                              onChange={(e) => setBookName(e.target.value)}
+                              placeholder="student Name"
                             />
                             <FormErrorMessage>
                               {form.errors.name}
@@ -433,37 +361,30 @@ const Products = () => {
                           </FormControl>
                         )}
                       </Field>
-                      <Field name="category" >
+                      <Field name="bookName">
                         {({ field, form }) => (
                           <FormControl
-                            isInvalid={
-                              form.errors.category && form.touched.category
-                            }
+                            isInvalid={form.errors.name && form.touched.name}
                           >
                             <FormLabel
                               fontSize={{ base: "sm", md: "md", lg: "lg" }}
                             >
-                              Genres:
+                              BookName:
                             </FormLabel>
-
-                            <Stack direction="row" {...field}>
-
-                              <Select placeholder='Select genre' onChange={(e) => { setGenreName(e.target.value) }}>
-                                {
-                                  categories.map(item => (<option value={item.genreName} key={item.id}>{item.genreName}</option>))
-                                }
-
-                              </Select>
-                            </Stack>
-
+                            <Input
+                              value={bookName}
+                              onChange={e => setBookName(e.target.value)}
+                              type="text"
+                              fontSize={{ base: "sm", md: "md", lg: "lg" }}
+                              placeholder="book name"
+                            />
                             <FormErrorMessage>
-                              {form.errors.category}
+                              {form.errors.name}
                             </FormErrorMessage>
                           </FormControl>
                         )}
                       </Field>
-
-                      <Field name="author" >
+                      <Field name="borrowDate">
                         {({ field, form }) => (
                           <FormControl
                             isInvalid={form.errors.date && form.touched.date}
@@ -471,14 +392,14 @@ const Products = () => {
                             <FormLabel
                               fontSize={{ base: "sm", md: "md", lg: "lg" }}
                             >
-                              Author:
+                              Borrowdate:
                             </FormLabel>
                             <Input
+                              value={borrowDate}
+                              onChange={e => setBorrowDate(e.target.value)}
                               fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              type="text"
-                              placeholder=""
-                              value={authorName}
-                              onChange={(e) => setAuthorName(e.target.value)}
+                              type="date"
+                              placeholder="Birthdate"
                             />
                             <FormErrorMessage>
                               {form.errors.date}
@@ -486,41 +407,25 @@ const Products = () => {
                           </FormControl>
                         )}
                       </Field>
-                      <Field name="language" >
+                      <Field name="returnDate">
                         {({ field, form }) => (
                           <FormControl
-                            isInvalid={
-                              form.errors.category && form.touched.category
-                            }
+                            isInvalid={form.errors.date && form.touched.date}
                           >
                             <FormLabel
                               fontSize={{ base: "sm", md: "md", lg: "lg" }}
                             >
-                              Language:
+                              Returndate:
                             </FormLabel>
-                            <RadioGroup
-                              onChange={e => setLanguage(e)}
-                              name="language"
-
-                            >
-                              <Stack direction="row" {...field}>
-                                <Radio
-                                  size={{ base: "sm", md: "md" }}
-                                  value="VietNamese"
-                                >
-                                  VietNamese
-                                </Radio>
-                                <Radio
-                                  size={{ base: "sm", md: "md" }}
-                                  value="English"
-                                >
-                                  English
-
-                                </Radio>
-                              </Stack>
-                            </RadioGroup>
+                            <Input
+                              value={returnDate}
+                              onChange={e => setReturnDate(e.target.value)}
+                              fontSize={{ base: "sm", md: "md", lg: "lg" }}
+                              type="date"
+                              placeholder="Birthdate"
+                            />
                             <FormErrorMessage>
-                              {form.errors.category}
+                              {form.errors.date}
                             </FormErrorMessage>
                           </FormControl>
                         )}
@@ -548,55 +453,6 @@ const Products = () => {
                           </FormControl>
                         )}
                       </Field>
-                      <Field name="price" >
-                        {({ field, form }) => (
-                          <FormControl
-                            isInvalid={form.errors.price && form.touched.price}
-                          >
-                            <FormLabel
-                              fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                            >
-                              Price:
-                            </FormLabel>
-                            <Input
-                              fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              type="number"
-                              value={price}
-                              onChange={(e) => setPrice(e.target.value)}
-                              placeholder="Price"
-                            />
-                            <FormErrorMessage>
-                              {form.errors.price}
-                            </FormErrorMessage>
-                          </FormControl>
-                        )}
-                      </Field>
-
-                      <Field name="description" >
-                        {({ field, form }) => (
-                          <FormControl
-                            isInvalid={form.errors.color && form.touched.color}
-                          >
-                            <FormLabel
-                              fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                            >
-                              Description:
-                            </FormLabel>
-                            <Textarea
-                              // value={value}
-                              // onChange={handleInputChange}
-                              placeholder="Description"
-                              value={description}
-                              onChange={(e) => setDescription(e.target.value)}
-                              fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                            />
-
-                            <FormErrorMessage>
-                              {form.errors.color}
-                            </FormErrorMessage>
-                          </FormControl>
-                        )}
-                      </Field>
                     </SimpleGrid>
                     <Button
                       mt={4}
@@ -619,15 +475,16 @@ const Products = () => {
         <Modal isOpen={isOpenModal} size="xl" onClose={onCloseModal}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Add New Book</ModalHeader>
+            <ModalHeader>Add New Item</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
+
               <HStack spacing={3} paddingY={3}>
                 <Button as="label" cursor="pointer" htmlFor="uploadIMG">
                   Choose Image
                 </Button>
 
-                <Text>{imageName}</Text>
+
                 <Input
                   onChange={imgUpload}
                   id="uploadIMG"
@@ -644,6 +501,7 @@ const Products = () => {
                 enableReinitialize={true}
                 initialValues={{
                   image: `${imgUrl}`,
+                  id: `${productList.length}`,
                   name: "",
                   category: `${value}`,
                   price: "",
@@ -656,10 +514,10 @@ const Products = () => {
                 }}
                 onSubmit={(values, actions) => {
                   setTimeout(() => {
-                    handleCreateNewBook();
+                    handleAddNewBorrowing();
                     onCloseModal();
                     toast({
-                      title: `Sách "${bookName}" is created`,
+                      title: `"${studentName}" is created`,
                       status: "success",
                       duration: 5000,
                       isClosable: true,
@@ -671,13 +529,12 @@ const Products = () => {
                 {(props) => (
                   <Form>
                     <SimpleGrid
-                      minChildWidth="250px"
+                      minChildWidth="200px"
                       spacingY={3}
                       spacingX={10}
                       mt={3}
                     >
-
-                      <Field name="name" >
+                      <Field name="studentName">
                         {({ field, form }) => (
                           <FormControl
                             isInvalid={form.errors.name && form.touched.name}
@@ -685,15 +542,14 @@ const Products = () => {
                             <FormLabel
                               fontSize={{ base: "sm", md: "md", lg: "lg" }}
                             >
-                              Name:
+                              studentName:
                             </FormLabel>
                             <Input
-
+                              value={studentName}
+                              onChange={e => setStudentName(e.target.value)}
                               type="text"
                               fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              placeholder="Name"
-                              value={bookName}
-                              onChange={(e) => setBookName(e.target.value)}
+                              placeholder="student Name"
                             />
                             <FormErrorMessage>
                               {form.errors.name}
@@ -701,37 +557,30 @@ const Products = () => {
                           </FormControl>
                         )}
                       </Field>
-                      <Field name="category" >
+                      <Field name="bookName">
                         {({ field, form }) => (
                           <FormControl
-                            isInvalid={
-                              form.errors.category && form.touched.category
-                            }
+                            isInvalid={form.errors.name && form.touched.name}
                           >
                             <FormLabel
                               fontSize={{ base: "sm", md: "md", lg: "lg" }}
                             >
-                              Genres:
+                              BookName:
                             </FormLabel>
-
-                            <Stack direction="row" {...field}>
-
-                              <Select placeholder='Select genre' onChange={(e) => { setGenreName(e.target.value) }}>
-                                {
-                                  categories.map(item => (<option value={item.genreName} key={item.id}>{item.genreName}</option>))
-                                }
-
-                              </Select>
-                            </Stack>
-
+                            <Input
+                              value={bookName}
+                              onChange={e => setBookName(e.target.value)}
+                              type="text"
+                              fontSize={{ base: "sm", md: "md", lg: "lg" }}
+                              placeholder="book name"
+                            />
                             <FormErrorMessage>
-                              {form.errors.category}
+                              {form.errors.name}
                             </FormErrorMessage>
                           </FormControl>
                         )}
                       </Field>
-
-                      <Field name="author" >
+                      <Field name="borrowDate">
                         {({ field, form }) => (
                           <FormControl
                             isInvalid={form.errors.date && form.touched.date}
@@ -739,14 +588,14 @@ const Products = () => {
                             <FormLabel
                               fontSize={{ base: "sm", md: "md", lg: "lg" }}
                             >
-                              Author:
+                              Borrowdate:
                             </FormLabel>
                             <Input
+                              value={borrowDate}
+                              onChange={e => setBorrowDate(e.target.value)}
                               fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              type="text"
-                              placeholder="Author"
-                              value={authorName}
-                              onChange={(e) => setAuthorName(e.target.value)}
+                              type="date"
+                              placeholder="Birthdate"
                             />
                             <FormErrorMessage>
                               {form.errors.date}
@@ -754,41 +603,25 @@ const Products = () => {
                           </FormControl>
                         )}
                       </Field>
-                      <Field name="language" >
+                      <Field name="returnDate">
                         {({ field, form }) => (
                           <FormControl
-                            isInvalid={
-                              form.errors.category && form.touched.category
-                            }
+                            isInvalid={form.errors.date && form.touched.date}
                           >
                             <FormLabel
                               fontSize={{ base: "sm", md: "md", lg: "lg" }}
                             >
-                              Language:
+                              Returndate:
                             </FormLabel>
-                            <RadioGroup
-                              onChange={e => setLanguage(e)}
-                              name="language"
-
-                            >
-                              <Stack direction="row" {...field}>
-                                <Radio
-                                  size={{ base: "sm", md: "md" }}
-                                  value="VietNamese"
-                                >
-                                  VietNamese
-                                </Radio>
-                                <Radio
-                                  size={{ base: "sm", md: "md" }}
-                                  value="English"
-                                >
-                                  English
-
-                                </Radio>
-                              </Stack>
-                            </RadioGroup>
+                            <Input
+                              value={returnDate}
+                              onChange={e => setReturnDate(e.target.value)}
+                              fontSize={{ base: "sm", md: "md", lg: "lg" }}
+                              type="date"
+                              placeholder="Birthdate"
+                            />
                             <FormErrorMessage>
-                              {form.errors.category}
+                              {form.errors.date}
                             </FormErrorMessage>
                           </FormControl>
                         )}
@@ -803,7 +636,7 @@ const Products = () => {
                             >
                               Quantity:
                             </FormLabel>
-                            <NumberInput defaultValue={1} min={1} max={50} step={1} onChange={e => setQuantity(e)}>
+                            <NumberInput defaultValue={modalData.quantity} min={1} max={50} step={1} onChange={e => setQuantity(e)}>
                               <NumberInputField />
                               <NumberInputStepper>
                                 <NumberIncrementStepper />
@@ -816,55 +649,6 @@ const Products = () => {
                           </FormControl>
                         )}
                       </Field>
-                      <Field name="price" >
-                        {({ field, form }) => (
-                          <FormControl
-                            isInvalid={form.errors.price && form.touched.price}
-                          >
-                            <FormLabel
-                              fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                            >
-                              Price:
-                            </FormLabel>
-                            <Input
-                              fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                              type="number"
-                              value={price}
-                              onChange={(e) => setPrice(e.target.value)}
-                              placeholder="Price"
-                            />
-                            <FormErrorMessage>
-                              {form.errors.price}
-                            </FormErrorMessage>
-                          </FormControl>
-                        )}
-                      </Field>
-
-                      <Field name="description" >
-                        {({ field, form }) => (
-                          <FormControl
-                            isInvalid={form.errors.color && form.touched.color}
-                          >
-                            <FormLabel
-                              fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                            >
-                              Description:
-                            </FormLabel>
-                            <Textarea
-                              // value={value}
-                              // onChange={handleInputChange}
-                              placeholder="Description"
-                              value={description}
-                              onChange={(e) => setDescription(e.target.value)}
-                              fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                            />
-
-                            <FormErrorMessage>
-                              {form.errors.color}
-                            </FormErrorMessage>
-                          </FormControl>
-                        )}
-                      </Field>
                     </SimpleGrid>
                     <Button
                       mt={4}
@@ -872,10 +656,11 @@ const Products = () => {
                       isLoading={props.isSubmitting}
                       type="submit"
                       fontSize={{ base: "sm", md: "md", lg: "lg" }}
+                      w="130px"
                       display="block"
                       margin="30px auto 10px auto"
                     >
-                      Add new book
+                      Add new Borrow
                     </Button>
                   </Form>
                 )}
@@ -902,7 +687,7 @@ const Products = () => {
                 leftIcon={<Icon fontSize="lg" as={AiOutlinePlus} />}
                 colorScheme="green"
               >
-                New Book
+                New Item
               </Button>
               <Button
                 p={2}
@@ -920,7 +705,7 @@ const Products = () => {
               pointerEvents="none"
               fontSize={{ base: "sm", md: "md" }}
             >
-              Manage Books
+              Manage Students
             </Text>
           </Stack>
           {isLoading ? (
@@ -937,39 +722,34 @@ const Products = () => {
               <Table variant="simple">
                 <Thead>
                   <Tr>
-                    <Th>Name</Th>
-                    <Th>Image</Th>
-                    <Th>Genre</Th>
-                    <Th>Author</Th>
-                    <Th>Language</Th>
+                    <Th>BorrowID</Th>
+                    <Th>StudentName</Th>
+                    <Th>BookName</Th>
+                    <Th>BorrowDate</Th>
+                    <Th>ReturnDate</Th>
                     <Th>Quantity</Th>
-                    <Th>Price</Th>
                     <Th textAlign="center">Edit</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {books.length > 0
-                    ? books.map((book) =>
-                      book == null ? (
+                  {borrowing.length > 0
+                    ? borrowing.map((borrow) =>
+                      borrow === null ? (
                         ""
                       ) : (
-                        <Tr key={book.id}>
-                          <Td w="400px">{book.bookName}</Td>
-                          <Td minW="150px">
-                            <Image
-                              w="100px"
-                              height="70px"
-                              rounded="lg"
-                              objectFit="cover"
-                              src={`../src/assets/books/${book.imageName}`}
-                              alt={book.imageName}
-                            />
+                        <Tr key={borrow.id}>
+                          <Td w="100px">{borrow.borrowID}</Td>
+                          <Td minW="100px">
+                            {borrow.studentName}
                           </Td>
-                          <Td>{book.genreName}</Td>
-                          <Td>{book.authorName}</Td>
-                          <Td>{book.language}</Td>
-                          <Td>{book.quantity}</Td>
-                          <Td>{book.price}</Td>
+                          <Td>{borrow.bookName}</Td>
+                          <Td>{borrow.borrowDate}</Td>
+                          <Td>{borrow.returnDate}</Td>
+                          <Td>{borrow.quantity}</Td>
+
+
+
+
                           <Td w="30px">
                             <HStack spacing={3}>
                               <IconButton
@@ -978,7 +758,7 @@ const Products = () => {
                                 size="sm"
                                 onClick={() => {
                                   onOpened();
-                                  setModalData(book);
+                                  setModalData(borrow);
                                 }}
                                 rounded="full"
                                 icon={<Icon as={AiOutlineEdit} />}
@@ -986,7 +766,7 @@ const Products = () => {
                               <IconButton
                                 onClick={() => {
                                   onOpen();
-                                  setDelId(book.bookID);
+                                  setDelId(borrow.borrowID);
                                 }}
                                 colorScheme="yellow"
                                 aria-label="Delete"
@@ -1011,8 +791,9 @@ const Products = () => {
           />
         </Box>
       </Container>
+
     </Box>
   );
 };
 
-export default memo(Products);
+export default memo(BorrowBook);

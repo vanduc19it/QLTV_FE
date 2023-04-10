@@ -6,6 +6,6 @@ export const store = configureStore({
   reducer: {
     products: productReducer,
     cart: cardReducer,
-    json:jsonReducer
+    json:jsonReducer,
   },
 });

@@ -10,9 +10,12 @@ import "@fontsource/poppins/600.css";
 import "@fontsource/poppins/700.css";
 import theme from "./theme/Theme.jsx";
 
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import HomeStudent from './HomeStudent/index.jsx'
 
 ReactDOM.createRoot(document.querySelector("#root")).render(
   <React.StrictMode>
+ 
     <ChakraProvider theme={theme}>
       <Provider store={store}>
         <ColorModeScript initialColorMode={theme.config.initialColorMode} />
