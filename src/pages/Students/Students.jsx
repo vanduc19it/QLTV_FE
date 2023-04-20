@@ -198,6 +198,7 @@ const Students = () => {
   const [gender, setGender] = useState("");
   const [birthday, setBirthday] = useState("");
   const [address, setAddress] = useState("");
+  const [password, setPassword] = useState("");
   const [uniID, setUniID] = useState(1);
 
   const handleAddNewStudent = async () => {
@@ -211,6 +212,7 @@ const Students = () => {
       gender,
       birthday,
       address,
+      password,
       uniID,
       imageName
     },

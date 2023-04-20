@@ -13,6 +13,7 @@ const HomeStudent = lazy(() => import("./HomeStudent/index.jsx"));
 const Login = lazy(() => import("./Login/Login.jsx"));
 const Register = lazy(() => import("./Login/Register.jsx"));
 const Detail = lazy(() => import("./HomeStudent/Detail.jsx"));
+const Profile = lazy(() => import("./HomeStudent/Profile.jsx"));
 const ProductsLazy = lazy(() => import("./pages/Products/Products.jsx"));
 const Employees = lazy(() => import("./pages/Employees/Employees.jsx"));
 const DashboardLazy = lazy(() => import("./pages/Dashboard/Dashboard.jsx"));
@@ -44,12 +45,13 @@ function App() {
 
         <Router>
           {
-            !true ? (
+              true ? (
               <Routes>
                 <Route path="/home" exact element={<HomeStudent />} />
                 <Route path="/login" exact element={<Login />} />
                 <Route path="/register" exact element={<Register />} />
-                <Route path="/detail" exact element={<Detail />} />
+                <Route path="/detail/:bookID" exact element={<Detail />} />
+                <Route path="profile" exact element={<Profile />} />
               </Routes>
             ) : (
               <Suspense
