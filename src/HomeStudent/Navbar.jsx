@@ -11,7 +11,8 @@ import { MdSearch } from "react-icons/md";
 import { startTransition, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import React, { useEffect } from 'react'
-
+import axios from "axios";
+import { baseURL } from "../urlserver.js";
 function Navbar() {
   const navigate = useNavigate();
   const navigateLogin = async () => {
@@ -61,6 +62,20 @@ function Navbar() {
     setCount(count + 1);
     window.location.reload()
   }
+
+
+  //get genres
+  const [genres, setGenres] = useState([]);
+
+  useEffect(() => {
+    const fetchGenres = async () => {
+      const { data } = await axios.get(`${baseURL}genres/get-all`);
+      setGenres(data);
+
+    };
+    fetchGenres();
+  }, []);
+  console.log(genres)
   return (
     <>
       <Box bg="#e1dcc5" w="75%" p={4} color="white" display="flex" justifyContent="space-between" margin="0 auto" alignItems="center">
@@ -80,12 +95,14 @@ function Navbar() {
           <MenuButton as={Button} bg="#e1dcc5" color="#333333">
             Category
           </MenuButton>
-          <MenuList>
-            <MenuItem>Download</MenuItem>
-            <MenuItem>Create a Copy</MenuItem>
-            <MenuItem>Mark as Draft</MenuItem>
-            <MenuItem>Delete</MenuItem>
-            <MenuItem>Attend a Workshop</MenuItem>
+          <MenuList color="black"
+          >
+            {
+              genres.map((genre) => (
+                <MenuItem >{genre.genreName}</MenuItem>
+              ))
+            }
+
           </MenuList>
         </Menu>
         <InputGroup size="md" w="300" >
@@ -108,7 +125,7 @@ function Navbar() {
                 <MenuButton >
                   <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
                     <Avatar size='sm' name='Dan Abrahmov' src='https://bit.ly/dan-abramov' />
-                    <Text fontSize="1xl" color="#333333" fontWeight="semibold" pl="6px">Hi {user.name}</Text>
+                    <Text fontSize="1xl" color="#333333" fontWeight="semibold" pl="6px">Hi, {user.name}</Text>
 
                   </div>
 
@@ -117,7 +134,6 @@ function Navbar() {
                   color="black"
                   transition='all 0..5s'
 
-                  borderRadius="1px solid black"
 
                 >
                   <MenuItem _hover={{ bg: '#e1dcc5' }} fontSize="1xl" color="#333333" fontWeight="semibold" onClick={navigateProfile}>Profile</MenuItem>

@@ -45,7 +45,7 @@ function App() {
 
         <Router>
           {
-            !true ? (
+            true ? (
               <Routes>
                 <Route path="/" exact element={<HomeStudent />} />
                 <Route path="/login" exact element={<Login />} />
