@@ -18,11 +18,14 @@ import logoLight from "../../assets/img/logo-light.png";
 import logoDark from "../../assets/img/logo-dark.png";
 import { NavData } from "../../data/NavData.jsx";
 import { HiMenuAlt3 } from "react-icons/hi"
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
+
 
 function Navbar({ navState, setNav }) {
   const logo = useColorModeValue(logoDark, logoLight);
   const [hover, isHover] = useBoolean();
+
+
   return (
     <Box
       as={motion.nav}

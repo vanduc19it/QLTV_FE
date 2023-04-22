@@ -8,9 +8,9 @@ import {
 import logo from "../assets/icons/logo.svg";
 import { MdSearch } from "react-icons/md";
 
-import { startTransition, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import React, { useEffect } from 'react'
+import { startTransition, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import React, { useEffect } from "react"
 import axios from "axios";
 import { baseURL } from "../urlserver.js";
 function Navbar() {
@@ -18,7 +18,7 @@ function Navbar() {
   const navigateLogin = async () => {
 
     await startTransition(() => {
-      navigate('/login')
+      navigate("/login")
 
     });
 
@@ -27,14 +27,14 @@ function Navbar() {
   const navigateRegister = async () => {
 
     await startTransition(() => {
-      navigate('/register')
+      navigate("/register")
 
     });
   }
   const navigateHome = async () => {
 
     await startTransition(() => {
-      navigate('/')
+      navigate("/")
 
     });
   }
@@ -42,7 +42,7 @@ function Navbar() {
   const navigateProfile = async () => {
 
     await startTransition(() => {
-      navigate('/profile')
+      navigate("/profile")
 
     });
   }
@@ -61,6 +61,7 @@ function Navbar() {
     localStorage.removeItem("userInfo")
     setCount(count + 1);
     window.location.reload()
+
   }
 
 
@@ -124,7 +125,7 @@ function Navbar() {
               <Menu >
                 <MenuButton >
                   <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-                    <Avatar size='sm' name='Dan Abrahmov' src='https://bit.ly/dan-abramov' />
+                    <Avatar size="sm" name={user.name} src={`../src/assets/students/${user.imageName}`} />
                     <Text fontSize="1xl" color="#333333" fontWeight="semibold" pl="6px">Hi, {user.name}</Text>
 
                   </div>
@@ -132,12 +133,12 @@ function Navbar() {
                 </MenuButton>
                 <MenuList
                   color="black"
-                  transition='all 0..5s'
+                  transition="all 0..5s"
 
 
                 >
-                  <MenuItem _hover={{ bg: '#e1dcc5' }} fontSize="1xl" color="#333333" fontWeight="semibold" onClick={navigateProfile}>Profile</MenuItem>
-                  <MenuItem _hover={{ bg: '#e1dcc5' }} fontSize="1xl" color="#333333" fontWeight="semibold" onClick={handleLogout}>Log out</MenuItem>
+                  <MenuItem _hover={{ bg: "#e1dcc5" }} fontSize="1xl" color="#333333" fontWeight="semibold" onClick={navigateProfile}>Profile</MenuItem>
+                  <MenuItem _hover={{ bg: "#e1dcc5" }} fontSize="1xl" color="#333333" fontWeight="semibold" onClick={handleLogout}>Log out</MenuItem>
 
 
                 </MenuList>

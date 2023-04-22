@@ -124,25 +124,26 @@ const Students = () => {
   const imgUpload = (ee) => {
     const file = ee.target.files[0];
     if (!file) return;
-    const storageRef = ref(storage, `${file.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        const progress = Math.round(
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        );
-        setProgresspercent(progress);
-      },
-      (error) => {
-        alert(error);
-      },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setImgUrl((url) => (url = downloadURL));
-        });
-      }
-    );
+    // const storageRef = ref(storage, `${file.name}`);
+    // const uploadTask = uploadBytesResumable(storageRef, file);
+    // uploadTask.on(
+    //   "state_changed",
+    //   (snapshot) => {
+    //     const progress = Math.round(
+    //       (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+    //     );
+    //     setProgresspercent(progress);
+    //   },
+    //   (error) => {
+    //     alert(error);
+    //   },
+    //   () => {
+    //     getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+    //       setImgUrl((url) => (url = downloadURL));
+    //     });
+    //   }
+    // );
+    setImageName(file.name)
   };
   function validate(value) {
     let error;
@@ -250,6 +251,7 @@ const Students = () => {
       setBirthday(modalData.birthday);
       setAddress(modalData.address);
       setUniID(modalData.uniID);
+      setImageName(modalData.imageName)
     }
 
   }, [modalData]);
@@ -345,7 +347,7 @@ const Students = () => {
                 m="0 auto"
                 objectFit="cover"
                 rounded="lg"
-                src={modalData.imageName}
+                src={`../src/assets/students/${imageName}`}
               />
               <Formik
                 enableReinitialize={true}
@@ -367,7 +369,7 @@ const Students = () => {
                     handleUpdateStudent();
                     onClosed();
                     toast({
-                      title: `"${name}" is created`,
+                      title: `"${name}" is updated`,
                       status: "success",
                       duration: 5000,
                       isClosable: true,
@@ -651,22 +653,14 @@ const Students = () => {
                   m="0 auto"
                   objectFit="cover"
                   rounded="lg"
-                  src={imgUrl}
+                  src={`../src/assets/students/${imageName}`}
                 />
               ) : null}
               <HStack spacing={3} paddingY={3}>
                 <Button as="label" cursor="pointer" htmlFor="uploadIMG">
                   Choose Image
                 </Button>
-                <CircularProgress
-                  value={progresspercent}
-                  size="40px"
-                  color="teal.400"
-                >
-                  <CircularProgressLabel>
-                    {progresspercent}%
-                  </CircularProgressLabel>
-                </CircularProgress>
+                <Text>{imageName}</Text>
                 <Input
                   onChange={imgUpload}
                   id="uploadIMG"
@@ -1043,10 +1037,20 @@ const Students = () => {
                       ) : (
                         <Tr key={student.id}>
                           <Td w="100px">{student.studentID}</Td>
+
+                          <Td minW="150px">
+                            <Image
+                              w="100px"
+
+                              rounded="lg"
+                              objectFit="cover"
+                              src={`../src/assets/students/${student.imageName}`}
+                              alt={student.imageName}
+                            />
+                          </Td>
                           <Td minW="100px">
                             {student.name}
                           </Td>
-                          <Td>{student.name}</Td>
                           <Td>{student.class}</Td>
                           <Td>{student.department}</Td>
                           <Td>{student.gender}</Td>

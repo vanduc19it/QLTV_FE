@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { chakra, useColorModeValue } from "@chakra-ui/react";
 import bgShapeLight from "./assets/img/effect-onlight.png";
 import bgShapeDark from "./assets/img/effect-ondark.png";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import Splasher from "./components/Splasher/Splasher.jsx";
 
 
@@ -11,6 +11,7 @@ import Splasher from "./components/Splasher/Splasher.jsx";
 const HomeLazy = lazy(() => import("./pages/Home/Home.jsx"));
 const HomeStudent = lazy(() => import("./HomeStudent/index.jsx"));
 const Login = lazy(() => import("./Login/Login.jsx"));
+const LoginAdmin = lazy(() => import("./Login/LoginAdmin.jsx"));
 const Register = lazy(() => import("./Login/Register.jsx"));
 const Detail = lazy(() => import("./HomeStudent/Detail.jsx"));
 const Profile = lazy(() => import("./HomeStudent/Profile.jsx"));
@@ -26,10 +27,18 @@ const SingleProductsLazy = lazy(() =>
 const LayoutLazy = lazy(() => import("./components/Layout/Layout.jsx"));
 function App() {
   const bgShape = useColorModeValue(bgShapeLight, bgShapeDark);
-  const role = localStorage.getItem("role");
-  console.log(role);
 
-  // const role = useSelector((state) => state.role);
+
+
+
+  const [count, setCount] = useState(1)
+  const [role, setRole] = useState(0)
+  useEffect(() => {
+    const role = JSON.parse(localStorage.getItem("role"))
+    setRole(role)
+  }, [])
+
+  console.log(role)
 
   return (
     <>
@@ -45,10 +54,11 @@ function App() {
 
         <Router>
           {
-            true ? (
+            role == 0 ? (
               <Routes>
                 <Route path="/" exact element={<HomeStudent />} />
                 <Route path="/login" exact element={<Login />} />
+                <Route path="/admin/login" exact element={<LoginAdmin />} />
                 <Route path="/register" exact element={<Register />} />
                 <Route path="/detail/:bookID" exact element={<Detail />} />
                 <Route path="profile" exact element={<Profile />} />
@@ -62,8 +72,8 @@ function App() {
 
                 <LayoutLazy>
                   <Routes>
-
-                    <Route path="/home" exact element={<HomeLazy />} />
+                    <Route path="/login" exact element={<Login />} />
+                    <Route path="/admin" exact element={<HomeLazy />} />
                     <Route path="/products" element={<ProductsLazy />} />
                     <Route path="/employees" element={<Employees />} />
                     <Route path="/dashboard" element={<DashboardLazy />} />

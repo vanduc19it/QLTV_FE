@@ -107,7 +107,7 @@ function Profile() {
                             >
                                 <Card maxW="sm" >
                                     <GridItem rowSpan={2} colSpan={1} padding="20px 20px" >
-                                        <Image src="https://bit.ly/dan-abramov" alt="Dan Abramov" />
+                                        <Image src={`../src/assets/students/${user.imageName}`} alt={user.name} />
                                         <Text fontSize="1xl" color="#333333" fontWeight="semibold" pl="6px" style={{ textAlign: "center", margin: "10px" }}>{user.name}</Text>
                                         <Text fontSize="1xl" color="#333333" pl="6px">Khoa: {user.department}</Text>
                                         <Text fontSize="1xl" color="#333333" pl="6px">Class: {user.class}</Text>

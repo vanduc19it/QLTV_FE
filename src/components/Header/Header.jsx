@@ -7,6 +7,8 @@ import {
   IconButton,
   Avatar,
   Menu,
+  MenuList,
+  MenuItem,
   MenuButton,
   useColorMode,
   useColorModeValue,
@@ -28,7 +30,7 @@ import {
   Image,
   Card,
 } from "@chakra-ui/react";
-import { useEffect, useRef, useState,memo } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 import { BsSun, BsMoonFill, BsBasket } from "react-icons/bs";
 import { IoNotificationsOutline } from "react-icons/io5";
 import { HiMenuAlt1 } from "react-icons/hi";
@@ -38,7 +40,11 @@ import {
 import avatar from "../../assets/img/avatar.jpg";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteCard } from "../../redux/cardSlice/cardSlice.jsx";
+import { useNavigate } from 'react-router-dom';
+import { startTransition } from 'react';
+
 function Header({ setNav }) {
+
   const { toggleColorMode } = useColorMode();
   const systemMode = useColorModeValue(BsSun, BsMoonFill);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -48,13 +54,40 @@ function Header({ setNav }) {
   const dispatch = useDispatch();
   const [delID, setDelID] = useState([]);
 
+
   useEffect(
     () => {
       dispatch(deleteCard(delID));
     },
-    [delID,dispatch]
+    [delID, dispatch]
   );
 
+
+  const navigate = useNavigate();
+
+  const [admin, setAdmin] = useState({})
+  useEffect(() => {
+    const admin = JSON.parse(localStorage.getItem("admin"))
+    setAdmin(admin)
+  }, [])
+
+
+
+
+  console.log(admin)
+
+
+  const navigateHome = () => {
+    localStorage.setItem("role", JSON.stringify(0));
+    navigate('/')
+    window.location.reload()
+  }
+
+  const handleLogout = () => {
+
+    navigate('/admin/login')
+    window.location.reload()
+  }
   return (
     <HStack pt="20px" bg="transparent" as="header">
       <Container maxW="full">
@@ -120,9 +153,7 @@ function Header({ setNav }) {
                   fontSize={{ base: "xl", sm: "3xl" }}
                 >
                   Empty!{" "}
-                  {/* <Text mt={4} fontSize={{ base: "sm", sm: "md" }}>
-                    Please,add item to basket!
-                  </Text> */}
+
                 </Heading>
               )}
             </DrawerBody>
@@ -131,10 +162,7 @@ function Header({ setNav }) {
               justifyContent="space-between"
               alignItems="center"
             >
-              {/* <Text fontSize="lg" fontWeight="700">
-                ${totalAmount}
-              </Text>
-              <Button colorScheme="blue">Pay</Button> */}
+
             </DrawerFooter>
           </DrawerContent>
         </Drawer>
@@ -214,6 +242,18 @@ function Header({ setNav }) {
                   icon={<Avatar size="sm" name="Nijat Hamid" src={avatar} />}
                   variant="outline"
                 />
+
+                <MenuList
+                  color="black"
+                  transition='all 0..5s'
+
+
+                >
+                  <MenuItem _hover={{ bg: '#e1dcc5' }} fontSize="1xl" color="#333333" fontWeight="semibold" onClick={navigateHome}>Trang chủ</MenuItem>
+                  <MenuItem _hover={{ bg: '#e1dcc5' }} fontSize="1xl" color="#333333" fontWeight="semibold" onClick={handleLogout}>Log out</MenuItem>
+
+
+                </MenuList>
               </Menu>
             </Box>
           </HStack>
