@@ -1,13 +1,13 @@
-import React from 'react'
-import Navbar from './Navbar.jsx'
-import { Box, Button, Card, FormControl, FormLabel, Grid, GridItem, Image, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Tab, TabList, TabPanel, TabPanels, Tabs, Text, useDisclosure } from '@chakra-ui/react'
-import AliceCarousel from 'react-alice-carousel'
+import React, { useState, useEffect } from "react"
+import Navbar from "./Navbar.jsx"
+import { Box, Button, Card, FormControl, FormLabel, Grid, GridItem, Image, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Tab, TabList, TabPanel, TabPanels, Tabs, Text, useDisclosure } from "@chakra-ui/react"
+import AliceCarousel from "react-alice-carousel"
 import logo1 from "../assets/books/1.jpg";
 import logo2 from "../assets/books/2.jpg";
 import logo3 from "../assets/books/3.jpg";
 import logo4 from "../assets/books/4.jpg";
 import logo5 from "../assets/books/5.jpg";
-import { useParams } from 'react-router-dom';
+import { useParams } from "react-router-dom";
 
 
 function Profile() {
@@ -20,7 +20,7 @@ function Profile() {
                 objectFit="cover"
                 alt=""
             />
-            <Button colorScheme='blue' mt="4" w="180px">Borrow</Button>
+            <Button colorScheme="blue" mt="4" w="180px">Borrow</Button>
 
         </div>,
         <div key={1} className="item" data-value="1">
@@ -30,7 +30,7 @@ function Profile() {
                 objectFit="cover"
                 alt=""
             />
-            <Button colorScheme='blue' mt="4" w="180px" >Borrow</Button>
+            <Button colorScheme="blue" mt="4" w="180px" >Borrow</Button>
 
         </div>,
         <div key={1} className="item" data-value="1">
@@ -40,7 +40,7 @@ function Profile() {
                 objectFit="cover"
                 alt=""
             />
-            <Button colorScheme='blue' mt="4" w="180px">Borrow</Button>
+            <Button colorScheme="blue" mt="4" w="180px">Borrow</Button>
         </div>,
         <div key={1} className="item" data-value="1">
             <Image
@@ -49,7 +49,7 @@ function Profile() {
                 objectFit="cover"
                 alt=""
             />
-            <Button colorScheme='blue' mt="4" w="180px" >Borrow</Button>
+            <Button colorScheme="blue" mt="4" w="180px" >Borrow</Button>
         </div>,
         <div key={1} className="item" data-value="1" display="flex">
             <Image
@@ -58,7 +58,7 @@ function Profile() {
                 objectFit="cover"
                 alt=""
             />
-            <Button colorScheme='blue' mt="4" w="180px">Borrow</Button>
+            <Button colorScheme="blue" mt="4" w="180px">Borrow</Button>
         </div>,
         <div key={1} className="item" data-value="1">
             <Image
@@ -76,7 +76,7 @@ function Profile() {
                 objectFit="cover"
                 alt=""
             />
-            <Button colorScheme='blue' mt="4" w="180px">Borrow</Button>
+            <Button colorScheme="blue" mt="4" w="180px">Borrow</Button>
         </div>,
 
     ]
@@ -95,42 +95,68 @@ function Profile() {
     const { bookID } = useParams();
     console.log(bookID)
 
-
+    const [user, setUser] = useState({})
+    useEffect(() => {
+        const userInfo = JSON.parse(localStorage.getItem("userInfo"))
+        setUser(userInfo)
+    }, [])
 
 
     return (
         <>
-            <Box bg='#e1dcc5' w='100%' hp={4} color='white'>
+            <Box bg="#e1dcc5" w="100%" hp={4} color="white" height="100vh">
                 <Navbar />
                 <Box width="75%" margin="20px auto">
-                    <Card >
-                        <Card>
+                    <Card height="80vh">
+                        <Card height="80vh">
                             <Grid
 
-                                templateRows='repeat(1, 1fr)'
-                                templateColumns='repeat(5, 1fr)'
+                                templateRows="repeat(1, 1fr)"
+                                templateColumns="repeat(5, 1fr)"
                                 gap={2}
                                 padding="20px 20px"
                             >
-                                <Card maxW='sm' style={{ height: "100%" }}>
+                                <Card maxW="sm" >
                                     <GridItem rowSpan={2} colSpan={1} padding="20px 20px" >
-                                        <Image src='https://bit.ly/dan-abramov' alt='Dan Abramov' />
-                                        <Text>DUc vip</Text>
-                                        <Button colorScheme='telegram' w="100%" onClick={onOpen} style={{ marginTop: "20px" }}>student</Button>
+                                        <Image src="https://bit.ly/dan-abramov" alt="Dan Abramov" />
+                                        <Text>{user.name}</Text>
+                                        <Text fontSize="1xl" color="#333333" fontWeight="semibold" pl="6px">Hi {user.class}</Text>
+                                        <Text fontSize="1xl" color="#333333" fontWeight="semibold" pl="6px">Hi {user.department}</Text>
+                                        <Text fontSize="1xl" color="#333333" fontWeight="semibold" pl="6px">Hi {user.class}</Text>
+                                        <Text fontSize="1xl" color="#333333" fontWeight="semibold" pl="6px">Hi {user.department}</Text>
+                                        <Button colorScheme="telegram" w="100%" onClick={onOpen} style={{ marginTop: "20px" }}>student</Button>
 
                                     </GridItem>
 
                                 </Card>
 
                                 <GridItem colSpan={4} rowSpan={10}  >
-                                    <Tabs variant='unstyled' aria-orientation="vertical">
+                                    <Tabs variant="unstyled" aria-orientation="vertical">
                                         <TabList aria-orientation="vertical">
-                                            <Tab _selected={{ color: 'white', bg: 'blue.500' }}>Tab 1</Tab>
-                                            <Tab _selected={{ color: 'white', bg: 'green.400' }}>Tab 2</Tab>
+                                            <Tab _selected={{ color: "white", bg: "blue.500" }}>Borrowing</Tab>
+                                            <Tab _selected={{ color: "white", bg: "green.400" }}>Setting</Tab>
                                         </TabList>
                                         <TabPanels aria-orientation="horizontal">
                                             <TabPanel>
-                                                <p>one!</p>
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Column 1</th>
+                                                            <th>Column 2</th>
+                                                            <th>Column 1</th>
+                                                            <th>Column 2</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Row 1, Column 1</td>
+                                                            <td>Row 1, Column 2</td>
+                                                            <td>Row 1, Column 1</td>
+                                                            <td>Row 1, Column 2</td>
+                                                        </tr>
+
+                                                    </tbody>
+                                                </table>
                                             </TabPanel>
                                             <TabPanel>
                                                 <p>two!</p>
@@ -149,7 +175,7 @@ function Profile() {
 
             </Box >
             {/* borrow modal */}
-            <Modal Modal
+            <Modal Modal Modal
                 initialFocusRef={initialRef}
                 finalFocusRef={finalRef}
                 isOpen={isOpen}
@@ -162,17 +188,17 @@ function Profile() {
                     <ModalBody pb={6}>
                         <FormControl>
                             <FormLabel>First name</FormLabel>
-                            <Input ref={initialRef} placeholder='First name' />
+                            <Input ref={initialRef} placeholder="First name" />
                         </FormControl>
 
                         <FormControl mt={4}>
                             <FormLabel>Last name</FormLabel>
-                            <Input placeholder='Last name' />
+                            <Input placeholder="Last name" />
                         </FormControl>
                     </ModalBody>
 
                     <ModalFooter>
-                        <Button colorScheme='blue' mr={3}>
+                        <Button colorScheme="blue" mr={3}>
                             Save
                         </Button>
                         <Button onClick={onClose}>Cancel</Button>

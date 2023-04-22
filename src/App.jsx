@@ -45,9 +45,9 @@ function App() {
 
         <Router>
           {
-              true ? (
+            !true ? (
               <Routes>
-                <Route path="/home" exact element={<HomeStudent />} />
+                <Route path="/" exact element={<HomeStudent />} />
                 <Route path="/login" exact element={<Login />} />
                 <Route path="/register" exact element={<Register />} />
                 <Route path="/detail/:bookID" exact element={<Detail />} />
@@ -63,7 +63,7 @@ function App() {
                 <LayoutLazy>
                   <Routes>
 
-                    <Route path="/" exact element={<HomeLazy />} />
+                    <Route path="/home" exact element={<HomeLazy />} />
                     <Route path="/products" element={<ProductsLazy />} />
                     <Route path="/employees" element={<Employees />} />
                     <Route path="/dashboard" element={<DashboardLazy />} />
