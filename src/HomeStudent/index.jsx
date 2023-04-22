@@ -54,7 +54,6 @@ function index() {
 
 
 
-
   const [user, setUser] = useState({})
 
   useEffect(() => {
@@ -69,16 +68,13 @@ function index() {
   console.log(user, JSON.stringify(user))
 
 
-
   const [book, setBook] = useState({})
 
   const handleOpen = async (bookID) => {
 
-
-
     console.log(bookID)
 
-
+    //handle get book byid
     await axios.post(`${baseURL}book/byID`, {
       bookID,
     },
