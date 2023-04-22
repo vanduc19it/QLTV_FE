@@ -98,8 +98,8 @@ function Navbar() {
           <MenuList color="black"
           >
             {
-              genres.map((genre) => (
-                <MenuItem >{genre.genreName}</MenuItem>
+              genres.map((genre, key) => (
+                <MenuItem key={key}>{genre.genreName}</MenuItem>
               ))
             }
 

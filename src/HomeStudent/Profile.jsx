@@ -1,109 +1,98 @@
 import React, { useState, useEffect } from "react"
 import Navbar from "./Navbar.jsx"
-import { Box, Button, Card, FormControl, FormLabel, Grid, GridItem, Image, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Tab, TabList, TabPanel, TabPanels, Tabs, Text, useDisclosure } from "@chakra-ui/react"
-import AliceCarousel from "react-alice-carousel"
-import logo1 from "../assets/books/1.jpg";
-import logo2 from "../assets/books/2.jpg";
-import logo3 from "../assets/books/3.jpg";
-import logo4 from "../assets/books/4.jpg";
-import logo5 from "../assets/books/5.jpg";
-import { useParams } from "react-router-dom";
+import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Box, Button, Card, FormControl, FormLabel, Grid, GridItem, Image, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Tab, TabList, TabPanel, TabPanels, Tabs, Text, useDisclosure } from "@chakra-ui/react"
 
+
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { baseURL } from "../urlserver.js";
 
 function Profile() {
 
-    const items = [
-        <div key={1} className="item" data-value="1" >
-            <Image
-                src={logo1}
-                height="260px"
-                objectFit="cover"
-                alt=""
-            />
-            <Button colorScheme="blue" mt="4" w="180px">Borrow</Button>
-
-        </div>,
-        <div key={1} className="item" data-value="1">
-            <Image
-                src={logo2}
-                height="260px"
-                objectFit="cover"
-                alt=""
-            />
-            <Button colorScheme="blue" mt="4" w="180px" >Borrow</Button>
-
-        </div>,
-        <div key={1} className="item" data-value="1">
-            <Image
-                src={logo3}
-                height="260px"
-                objectFit="cover"
-                alt=""
-            />
-            <Button colorScheme="blue" mt="4" w="180px">Borrow</Button>
-        </div>,
-        <div key={1} className="item" data-value="1">
-            <Image
-                src={logo4}
-                height="260px"
-                objectFit="cover"
-                alt=""
-            />
-            <Button colorScheme="blue" mt="4" w="180px" >Borrow</Button>
-        </div>,
-        <div key={1} className="item" data-value="1" display="flex">
-            <Image
-                src={logo5}
-                height="260px"
-                objectFit="cover"
-                alt=""
-            />
-            <Button colorScheme="blue" mt="4" w="180px">Borrow</Button>
-        </div>,
-        <div key={1} className="item" data-value="1">
-            <Image
-                src={logo1}
-                height="260px"
-                objectFit="cover"
-                alt=""
-            />
-            <Button colorScheme="blue" mt="4" w="180px" >Borrow</Button>
-        </div>,
-        <div key={1} className="item" data-value="1">
-            <Image
-                src={logo2}
-                height="260px"
-                objectFit="cover"
-                alt=""
-            />
-            <Button colorScheme="blue" mt="4" w="180px">Borrow</Button>
-        </div>,
-
-    ]
-    const responsive = {
-        0: { items: 1 },
-        568: { items: 2 },
-        1024: { items: 5 },
-    };
-
-
-    const { isOpen, onOpen, onClose } = useDisclosure()
-
-    const initialRef = React.useRef(null)
-    const finalRef = React.useRef(null)
-
-    const { bookID } = useParams();
-    console.log(bookID)
-
+    const [count, setCount] = useState(0)
     const [user, setUser] = useState({})
+
     useEffect(() => {
         const userInfo = JSON.parse(localStorage.getItem("userInfo"))
         setUser(userInfo)
+        setCount(count + 1)
     }, [])
 
+    console.log(user)
+
+    const [borrowing, setBorrowing] = useState([]);
+
+    useEffect(() => {
+        const fetchBorrowing = async () => {
+            const { data } = await axios.post(`${baseURL}borrow/studentID`, {
+                studentID: user.studentID,
+            })
+            console.log(data)
+            setBorrowing(data);
+        };
+        fetchBorrowing();
+    }, [count]);
+    console.log(borrowing)
+
+    const { isOpen, onOpen, onClose } = useDisclosure()
+    const cancelRef = React.useRef()
+
+
+
+    const [borrowDelete, setBorrowDelete] = useState();
+    const handleOpen = (item) => {
+        onOpen();
+        setBorrowDelete(item)
+    }
+    console.log(borrowDelete)
+
+
+    const handleDeleteBorrow = async () => {
+        await axios.delete(`${baseURL}borrowing/delete/${borrowDelete.borrowID}`, {
+            borrowID: borrowDelete.borrowID,
+        },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: 'application/json',
+                }
+            })
+            .then((response) => {
+                console.log(response);
+            });
+        setCount(count + 1);
+        onClose();
+    }
 
     return (
         <>
+
+            <AlertDialog
+                isOpen={isOpen}
+                leastDestructiveRef={cancelRef}
+                onClose={onClose}
+            >
+                <AlertDialogOverlay>
+                    <AlertDialogContent>
+                        <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                            Cancel Register Borrow Book
+                        </AlertDialogHeader>
+
+                        <AlertDialogBody>
+                            Are you sure?
+                        </AlertDialogBody>
+
+                        <AlertDialogFooter>
+                            <Button ref={cancelRef} onClick={onClose}>
+                                Cancel
+                            </Button>
+                            <Button colorScheme='red' onClick={handleDeleteBorrow} ml={3}>
+                                Delete
+                            </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
             <Box bg="#e1dcc5" w="100%" hp={4} color="white" height="100vh">
                 <Navbar />
                 <Box width="75%" margin="20px auto">
@@ -119,12 +108,10 @@ function Profile() {
                                 <Card maxW="sm" >
                                     <GridItem rowSpan={2} colSpan={1} padding="20px 20px" >
                                         <Image src="https://bit.ly/dan-abramov" alt="Dan Abramov" />
-                                        <Text>{user.name}</Text>
-                                        <Text fontSize="1xl" color="#333333" fontWeight="semibold" pl="6px">Hi {user.class}</Text>
-                                        <Text fontSize="1xl" color="#333333" fontWeight="semibold" pl="6px">Hi {user.department}</Text>
-                                        <Text fontSize="1xl" color="#333333" fontWeight="semibold" pl="6px">Hi {user.class}</Text>
-                                        <Text fontSize="1xl" color="#333333" fontWeight="semibold" pl="6px">Hi {user.department}</Text>
-                                        <Button colorScheme="telegram" w="100%" onClick={onOpen} style={{ marginTop: "20px" }}>student</Button>
+                                        <Text fontSize="1xl" color="#333333" fontWeight="semibold" pl="6px" style={{ textAlign: "center", margin: "10px" }}>{user.name}</Text>
+                                        <Text fontSize="1xl" color="#333333" pl="6px">Khoa: {user.department}</Text>
+                                        <Text fontSize="1xl" color="#333333" pl="6px">Class: {user.class}</Text>
+                                        <Text fontSize="1xl" color="#333333" pl="6px">Address: {user.address}</Text>
 
                                     </GridItem>
 
@@ -138,28 +125,39 @@ function Profile() {
                                         </TabList>
                                         <TabPanels aria-orientation="horizontal">
                                             <TabPanel>
-                                                <table>
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Column 1</th>
-                                                            <th>Column 2</th>
-                                                            <th>Column 1</th>
-                                                            <th>Column 2</th>
+                                                <table style={{ border: "1px solid black", boxShadow: "4px 4px 4px #ccc" }}>
+                                                    <thead style={{ border: "1px solid black" }}>
+                                                        <tr style={{ border: "1px solid black" }}>
+                                                            <th style={{ border: "1px solid black", width: "40px", textAlign: "center" }}>STT</th>
+                                                            <th style={{ border: "1px solid black", width: "200px", textAlign: "center" }}>Full name</th>
+                                                            <th style={{ border: "1px solid black", width: "200px", textAlign: "center" }} >Book name</th>
+                                                            <th style={{ border: "1px solid black", width: "100px", textAlign: "center" }}>Borrow Date</th>
+                                                            <th style={{ border: "1px solid black", width: "100px", textAlign: "center" }}>Return Date</th>
+                                                            <th style={{ border: "1px solid black", width: "80px", textAlign: "center" }}>Hủy</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>Row 1, Column 1</td>
-                                                            <td>Row 1, Column 2</td>
-                                                            <td>Row 1, Column 1</td>
-                                                            <td>Row 1, Column 2</td>
-                                                        </tr>
+                                                    <tbody style={{ border: "1px solid black" }}>
+                                                        {
+                                                            borrowing.map((item, index) => (
+                                                                <tr key={index} style={{ border: "1px solid black" }}>
+                                                                    <td style={{ border: "1px solid black", width: "40px", textAlign: "center" }}>{index + 1}</td>
+                                                                    <td style={{ border: "1px solid black", width: "40px", textAlign: "center" }}>{item.studentName}</td>
+                                                                    <td style={{ border: "1px solid black", width: "40px", textAlign: "center" }}>{item.bookName}</td>
+                                                                    <td style={{ border: "1px solid black", width: "40px", textAlign: "center" }}>{item.borrowDate}</td>
+                                                                    <td style={{ border: "1px solid black", width: "40px", textAlign: "center" }}>{item.returnDate}</td>
+                                                                    <td style={{ border: "1px solid black", width: "40px", textAlign: "center" }}>
+                                                                        <Button colorScheme='red' size="sm" onClick={() => handleOpen(item)}>X </Button>
+                                                                    </td>
+                                                                </tr>
+                                                            ))
+                                                        }
+
 
                                                     </tbody>
                                                 </table>
                                             </TabPanel>
                                             <TabPanel>
-                                                <p>two!</p>
+                                                <p>setting!</p>
                                             </TabPanel>
                                         </TabPanels>
                                     </Tabs>
@@ -174,37 +172,7 @@ function Profile() {
                 </Box >
 
             </Box >
-            {/* borrow modal */}
-            <Modal Modal Modal
-                initialFocusRef={initialRef}
-                finalFocusRef={finalRef}
-                isOpen={isOpen}
-                onClose={onClose}
-            >
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>Create your account</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody pb={6}>
-                        <FormControl>
-                            <FormLabel>First name</FormLabel>
-                            <Input ref={initialRef} placeholder="First name" />
-                        </FormControl>
 
-                        <FormControl mt={4}>
-                            <FormLabel>Last name</FormLabel>
-                            <Input placeholder="Last name" />
-                        </FormControl>
-                    </ModalBody>
-
-                    <ModalFooter>
-                        <Button colorScheme="blue" mr={3}>
-                            Save
-                        </Button>
-                        <Button onClick={onClose}>Cancel</Button>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal >
         </>
     )
 }

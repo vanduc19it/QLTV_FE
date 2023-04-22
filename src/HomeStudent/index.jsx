@@ -233,6 +233,7 @@ function index() {
 
   const handleBorrowBook = async () => {
     await axios.post(`${baseURL}borrowing/add-new`, {
+      studentID: user.studentID,
       studentName: user.name,
       bookName: book.bookName,
       borrowDate,

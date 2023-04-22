@@ -184,6 +184,7 @@ const BorrowBook = () => {
   const handleAddNewBorrowing = async () => {
 
     await axios.post(`${baseURL}borrowing/add-new`, {
+      studentID: 1,
       studentName,
       bookName,
       borrowDate,
