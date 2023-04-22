@@ -67,7 +67,8 @@ function Login() {
           setIsFail(false);
           setStudents(response.data);
 
-          navigate('/home')
+          navigate('/')
+          localStorage.setItem("userInfo", JSON.stringify(response.data[0]));
 
         } else {
           setIsFail(true);
@@ -99,8 +100,7 @@ function Login() {
           <Box>
             <AlertTitle>Success!</AlertTitle>
             <AlertDescription>
-              Your application has been received. We will review your application
-              and respond within the next 48 hours.
+              Đăng nhập thành công!.
             </AlertDescription>
           </Box>
           <CloseButton
@@ -137,12 +137,12 @@ function Login() {
 
             <MDBCol sm="10">
 
-              <div className='d-flex flex-row ps-5 pt-5'>
+              <div className="d-flex flex-row ps-5 pt-5">
 
 
               </div>
 
-              <div className='d-flex flex-column justify-content-center h-custom-2 w-70 pt-4 pl-10 '>
+              <div className="d-flex flex-column justify-content-center h-custom-2 w-70 pt-4 pl-10 ">
                 <Image
                   src={logo}
                   w="30"
@@ -153,14 +153,14 @@ function Login() {
                   mb="40px"
                   pl="60px"
                 />
-                <h3 className="fw-normal mb-3 ps-5 pb-3" style={{ letterSpacing: '1px' }}>Log in</h3>
+                <h3 className="fw-normal mb-3 ps-5 pb-3" style={{ letterSpacing: "1px" }}>Log in</h3>
 
-                <MDBInput wrapperClass='mb-4 mx-5 w-100' label='Email address' id='formControlLg' type='email' size="lg" value={email} onChange={(e) => setEmail(e.target.value)} />
-                <MDBInput wrapperClass='mb-4 mx-5 w-100' label='Password' id='formControlLg' type='password' size="lg" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <MDBInput wrapperClass="mb-4 mx-5 w-100" label="Email address" id="formControlLg" type="email" size="lg" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <MDBInput wrapperClass="mb-4 mx-5 w-100" label="Password" id="formControlLg" type="password" size="lg" value={password} onChange={(e) => setPassword(e.target.value)} />
 
-                <MDBBtn className="mb-4 px-5 mx-5 w-100" color='info' size='lg' onClick={handleLogin}>Login</MDBBtn>
+                <MDBBtn className="mb-4 px-5 mx-5 w-100" color="info" size="lg" onClick={handleLogin}>Login</MDBBtn>
 
-                <p className='ms-5'>Don't have an account? <a href="/register" class="link-info">Register here</a></p>
+                <p className="ms-5">Don't have an account? <a href="/register" class="link-info">Register here</a></p>
 
               </div>
 
