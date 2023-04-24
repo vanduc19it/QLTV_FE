@@ -57,8 +57,10 @@ function App() {
             role == 0 ? (
               <Routes>
                 <Route path="/" exact element={<HomeStudent />} />
+
                 <Route path="/login" exact element={<Login />} />
                 <Route path="/admin/login" exact element={<LoginAdmin />} />
+                <Route path="/employee/login" exact element={<HomeStudent />} />
                 <Route path="/register" exact element={<Register />} />
                 <Route path="/detail/:bookID" exact element={<Detail />} />
                 <Route path="profile" exact element={<Profile />} />

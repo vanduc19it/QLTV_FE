@@ -71,6 +71,7 @@ import { storage } from "../../firebase/Firebase.jsx";
 import { memo } from "react";
 import axios from "axios";
 import { baseURL } from "../../urlserver.js";
+import moment from "moment";
 const BorrowBook = () => {
 
 
@@ -155,6 +156,46 @@ const BorrowBook = () => {
     fetchBorrowing();
   }, [count]);
   console.log(borrowing)
+
+
+  // const [book, setBook] = useState([])
+
+  // const [count1,setCount1] = useState(1)
+  // useEffect(() => {
+  //   async function fetchBooks() {
+
+  //     for(let i = 0; i<borrowing.length; i++) {
+  //       async () => {
+  //         const {data} = await axios.post(`${baseURL}book/byID`, {
+  //           bookID:borrowing[i].bookID,
+  //         });
+  //         setBook(data);
+          
+          
+  //       }
+  //       if(i == borrowing.length-1 ) {
+  //         setCount1(count1)
+ 
+  //       }else {
+  //         setCount1(count1+1)
+     
+  //       }
+       
+  //     }
+     
+     
+      
+  //   }
+  //   fetchBooks();
+    
+  // }, [count1]);
+ 
+  
+ 
+
+
+
+  // console.log(book)
 
   const [delId, setDelId] = useState();
   // handle delete borrowing
@@ -706,7 +747,7 @@ const BorrowBook = () => {
               pointerEvents="none"
               fontSize={{ base: "sm", md: "md" }}
             >
-              Manage Students
+              Manage Borrow Books
             </Text>
           </Stack>
           {isLoading ? (
@@ -728,25 +769,48 @@ const BorrowBook = () => {
                     <Th>BookName</Th>
                     <Th>BorrowDate</Th>
                     <Th>ReturnDate</Th>
-                    <Th>Quantity</Th>
+                    {/* <Th>Quantity</Th> */}
                     <Th textAlign="center">Edit</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
                   {borrowing.length > 0
-                    ? borrowing.map((borrow) =>
+                    ? borrowing.map((borrow,index) =>
                       borrow === null ? (
                         ""
                       ) : (
                         <Tr key={borrow.id}>
                           <Td w="100px">{borrow.borrowID}</Td>
+                          {/* <Td minW="150px">
+                            {
+                            book[index] != undefined ? 
+                            <Image
+                              w="100px"
+
+                              rounded="lg"
+                              objectFit="cover"
+                              src={`../src/assets/books/${book[index].imageName}`}
+                              alt=""
+                            />
+                            :
+                            <Image
+                            w="100px"
+
+                            rounded="lg"
+                            objectFit="cover"
+                            src="{`../src/assets/books/${book[index].imageName}`}"
+                            alt=""
+                          />
+                          }
+                            
+                          </Td> */}
                           <Td minW="100px">
                             {borrow.studentName}
                           </Td>
                           <Td>{borrow.bookName}</Td>
-                          <Td>{borrow.borrowDate}</Td>
-                          <Td>{borrow.returnDate}</Td>
-                          <Td>{borrow.quantity}</Td>
+                          <Td>{moment(`${borrow.borrowDate}`).format('L')}</Td>
+                          <Td>{moment(`${borrow.returnDate}`).format('L')}</Td>
+                       
 
 
 

@@ -69,10 +69,12 @@ function index() {
 
 
   const [book, setBook] = useState({})
+  const [bookID, setBookID] = useState(null)
 
   const handleOpen = async (bookID) => {
 
     console.log(bookID)
+    setBookID(bookID)
 
     //handle get book byid
     await axios.post(`${baseURL}book/byID`, {
@@ -102,7 +104,7 @@ function index() {
 
   }
 
-  console.log(book)
+  console.log(book, bookID)
 
   const labels = [
     <div key={1} className="item" data-value="1" style={{ backgroundColor: "#fcfbf7", borderRadius: "4px", display: "flex", justifyContent: "space-around", width: "320px", height: "150px", border: "1px solid #ddd" }}>
@@ -235,6 +237,7 @@ function index() {
     await axios.post(`${baseURL}borrowing/add-new`, {
       studentID: user.studentID,
       studentName: user.name,
+      bookID:bookID,
       bookName: book.bookName,
       borrowDate,
       returnDate,

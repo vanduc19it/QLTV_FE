@@ -67,6 +67,8 @@ import { storage } from "../../firebase/Firebase.jsx";
 import { memo } from "react";
 import axios from "axios";
 import { baseURL } from "../../urlserver.js";
+import moment from "moment";
+import Select1 from "react-select";
 const Students = () => {
 
 
@@ -295,6 +297,30 @@ const Students = () => {
   }
 
 
+  const [uni, setUni] = useState(1);
+  const handleSelectUni = async(e) => {
+    setUni(e.value);
+    
+    
+    setTimeout("",3000);
+
+    if(uni== 0) {
+      setCount(count+1)
+    }
+
+    const { data } = await axios.post(`${baseURL}students/uniID`, {
+      uniID: uni,
+  })
+  
+  console.log(data)
+  setStudents(data);
+    
+  
+}
+
+
+
+  console.log(uni)
 
   return (
     <Box minH="90vh" my={5}>
@@ -625,7 +651,7 @@ const Students = () => {
                       isLoading={props.isSubmitting}
                       type="submit"
                       fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                      w="130px"
+                  
                       display="block"
                       margin="30px auto 10px auto"
                     >
@@ -994,6 +1020,15 @@ const Students = () => {
               >
                 Export DB
               </Button>
+            
+
+                              <Select1 
+                      placeholder="Select University" defaultValue={1} 
+                      options={[{ value: 0, label: "TẤT CẢ" },{ value: 1, label: "ĐH CNTT & TT VIỆT HÀN" }, { value: 2, label: "ĐH BÁCH KHOA" },{ value: 3, label: "ĐH SƯ PHẠM" }, { value: 4, label: "ĐH KINH TẾ" },{ value: 5, label: "ĐH SP KỸ THUẬT" }]} 
+                      onChange={(e)=>handleSelectUni(e)}>
+                        
+                      
+              </Select1>
             </ButtonGroup>
             <Text
               fontWeight="600"
@@ -1054,7 +1089,7 @@ const Students = () => {
                           <Td>{student.class}</Td>
                           <Td>{student.department}</Td>
                           <Td>{student.gender}</Td>
-                          <Td>{student.birthday}</Td>
+                          <Td>{moment(`${student.birthday}`).calendar()}</Td>
 
                           <Td>
                             {student.address}

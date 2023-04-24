@@ -66,6 +66,8 @@ import { storage } from "../../firebase/Firebase.jsx";
 import { memo } from "react";
 import axios from "axios";
 import { baseURL } from "../../urlserver.js";
+import moment from "moment"
+import Select from "react-select";
 const Employees = () => {
 
 
@@ -91,6 +93,7 @@ const Employees = () => {
   }, [dispatch]);
 
 
+  
 
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -122,25 +125,27 @@ const Employees = () => {
   const imgUpload = (ee) => {
     const file = ee.target.files[0];
     if (!file) return;
-    const storageRef = ref(storage, `${file.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        const progress = Math.round(
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        );
-        setProgresspercent(progress);
-      },
-      (error) => {
-        alert(error);
-      },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setImgUrl((url) => (url = downloadURL));
-        });
-      }
-    );
+    // const storageRef = ref(storage, `${file.name}`);
+    // const uploadTask = uploadBytesResumable(storageRef, file);
+    // uploadTask.on(
+    //   "state_changed",
+    //   (snapshot) => {
+    //     const progress = Math.round(
+    //       (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+    //     );
+    //     setProgresspercent(progress);
+    //   },
+    //   (error) => {
+    //     alert(error);
+    //   },
+    //   () => {
+    //     getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+    //       setImgUrl((url) => (url = downloadURL));
+    //     });
+    //   }
+    // );
+    console.log(file.name)
+    setImageName(file.name)
   };
   function validate(value) {
     let error;
@@ -159,7 +164,9 @@ const Employees = () => {
 
   useEffect(() => {
     const fetchEmployees = async () => {
-      const { data } = await axios.get(`${baseURL}employees/get-all`);
+      // let employee = JSON.parse(localStorage.getItem("employee"))
+      // let uniID = employee.uniID ; 
+      const { data } = await axios.get(`${baseURL}employees/get-all/`);
       setEmployees(data);
       setIsLoading(false);
     };
@@ -187,12 +194,12 @@ const Employees = () => {
   // handle add new employee
 
 
-  const [imageName, setImageName] = useState("a")
+  const [imageName, setImageName] = useState("")
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [birthday, setBirthday] = useState("");
+  const [birthday, setBirthday] = useState("1/1/2000");
   const [gender, setGender] = useState("");
-  const [address, setAddress] = useState("");
+  const [address, setAddress] = useState("Đà Nẵng");
   const [phone, setPhone] = useState(0);
   const [salary, setSalary] = useState(0);
   const [uniID, setUniID] = useState(1);
@@ -231,7 +238,7 @@ const Employees = () => {
   };
 
 
-  console.log(modalData.employeeID);
+  
   useEffect(() => {
     if (modalData.employeeID) {
       setName(modalData.name);
@@ -292,6 +299,30 @@ const Employees = () => {
   }
 
 
+  const [uni, setUni] = useState(1);
+  const handleSelectUni = async(e) => {
+    setUni(e.value);
+    setUni(e.value);
+    
+    setTimeout("",3000);
+
+    if(uni== 0) {
+      setCount(count+1)
+    }
+
+    const { data } = await axios.post(`${baseURL}employees/uniID`, {
+      uniID: uni,
+  })
+  
+  console.log(data)
+  setEmployees(data);
+    
+  
+}
+
+
+
+  console.log(uni)
   return (
     <Box minH="90vh" my={5}>
       <Container maxW="full">
@@ -343,8 +374,26 @@ const Employees = () => {
                 m="0 auto"
                 objectFit="cover"
                 rounded="lg"
-                src={modalData.image}
+                src={`../src/assets/employees/${modalData.imageName}`}
               />
+              <HStack spacing={3} paddingY={3}>
+                <Button as="label" cursor="pointer" htmlFor="uploadIMG">
+                  Choose Image
+                </Button>
+
+                <Text>{imageName}</Text>
+                <Input
+                  onChange={imgUpload}
+                  id="uploadIMG"
+                  type="file"
+                  pointerEvents="none"
+                  position="absolute"
+                  visibility="hidden"
+                  zIndex="-333"
+                  opacity="0"
+                  accept="image/*"
+                />
+              </HStack>
               <Formik
                 initialValues={{
                   id: `${modalData.id}`,
@@ -612,7 +661,7 @@ const Employees = () => {
                 <Button as="label" cursor="pointer" htmlFor="uploadIMG">
                   Choose Image
                 </Button>
-                <Text></Text>
+                <Text>{imageName}</Text>
                 <Input
                   onChange={imgUpload}
                   id="uploadIMG"
@@ -915,6 +964,13 @@ const Employees = () => {
               >
                 Export DB
               </Button>
+              <Select 
+                      placeholder="Select University" defaultValue={1} 
+                      options={[{ value: 0, label: "TẤT CẢ" },{ value: 1, label: "ĐH CNTT & TT VIỆT HÀN" }, { value: 2, label: "ĐH BÁCH KHOA" },{ value: 3, label: "ĐH SƯ PHẠM" }, { value: 4, label: "ĐH KINH TẾ" },{ value: 5, label: "ĐH SP KỸ THUẬT" }]} 
+                      onChange={(e)=>handleSelectUni(e)}>
+                        
+                      
+              </Select>
             </ButtonGroup>
             <Text
               fontWeight="600"
@@ -959,11 +1015,17 @@ const Employees = () => {
                       ) : (
                         <Tr key={employee.id}>
                           <Td w="100px">{employee.employeeID}</Td>
-                          <Td minW="100px">
-                            {employee.name}
+                          <Td minW="150px">
+                            <Image
+                              w="100px"
+                              rounded="lg"
+                              objectFit="cover"
+                              src={`../src/assets/employees/${employee.imageName}`}
+                              alt={employee.imageName}
+                            />
                           </Td>
                           <Td>{employee.name}</Td>
-                          <Td>{employee.birthday}</Td>
+                          <Td>{moment(`${employee.birthday}`).format("L")}</Td>
                           <Td>{employee.gender}</Td>
                           <Td>
                             {employee.address}

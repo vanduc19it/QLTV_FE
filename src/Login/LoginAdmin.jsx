@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react"
 import {
     MDBBtn,
     MDBContainer,
@@ -8,13 +8,13 @@ import {
     MDBIcon,
     MDBInput
 }
-    from 'mdb-react-ui-kit';
+    from "mdb-react-ui-kit";
 
 import logo from "../assets/icons/logo.svg";
 import {
     Box,
     Card,
-    Button, Image, Select, Alert,
+    Button, Image, Alert,
     AlertIcon,
     AlertTitle,
     AlertDescription,
@@ -23,8 +23,9 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import { baseURL } from "../urlserver.js";
-import { useNavigate } from 'react-router-dom';
-import { startTransition } from 'react';
+import { useNavigate } from "react-router-dom";
+import { startTransition } from "react";
+import Select from "react-select";
 function LoginAdmin() {
     const [role, setRole] = useState(0);
     localStorage.setItem("role", role);
@@ -43,48 +44,89 @@ function LoginAdmin() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("")
+    const [roleID, setRoleID] = useState(1)
 
 
     const [admin, setAdmin] = useState({});
 
     const handleLogin = async () => {
 
+        if (roleID == 1) {
+            await axios.post(`${baseURL}admin/login`, {
+                email,
+                password,
+            },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                    }
+                })
+                .then((response) => {
 
-        await axios.post(`${baseURL}admin/login`, {
-            email,
-            password,
-        },
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    Accept: 'application/json',
-                }
-            })
-            .then((response) => {
+
+                    if (response.data.length > 0) {
+                        setIsSuccess(true);
+                        setIsFail(false);
+                        setAdmin(response.data);
+
+                        localStorage.setItem("role", JSON.stringify(response.data[0].role));
+                        localStorage.setItem("admin", JSON.stringify(response.data[0]));
+                        navigate("/admin")
+                        window.location.reload()
+                    } else {
+                        setIsFail(true);
+                        setIsSuccess(false);
+                        navigate("/admin/login")
+                    
+                    }
+                   
+
+                });
+
+        }
+        if (roleID == 2) {
+            await axios.post(`${baseURL}employee/login`, {
+                email,
+                password,
+            },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                    }
+                })
+                .then((response) => {
+                    console.log(response)
+
+                    if (response.data.length > 0) {
+                        setIsSuccess(true);
+                        setIsFail(false);
+                        setAdmin(response.data);
+
+                        localStorage.setItem("role", JSON.stringify(response.data[0].role));
+                        localStorage.setItem("employee", JSON.stringify(response.data[0]));
+                        console.log(response.data)
+
+                        navigate("/admin")
+                        window.location.reload()
+                    } else {
+                        setIsFail(true);
+                        setIsSuccess(false);
+                        navigate("/admin/login")
+                    }
+                  
+
+                });
+        }
 
 
-                if (response.data.length > 0) {
-                    setIsSuccess(true);
-                    setIsFail(false);
-                    setAdmin(response.data);
-
-                    localStorage.setItem("role", JSON.stringify(response.data[0].role));
-                    localStorage.setItem("admin", JSON.stringify(response.data[0]));
-
-                } else {
-                    setIsFail(true);
-                    setIsSuccess(false);
-                }
-                navigate('/admin')
-                window.location.reload()
-
-            });
 
 
 
 
     };
-    console.log(admin)
+   
     const [count, setCount] = useState(1)
     const [user, setUser] = useState({})
     useEffect(() => {
@@ -154,10 +196,16 @@ function LoginAdmin() {
                                 />
 
 
-                                <MDBInput placeholder='Input email' wrapperClass="mb-4 mx-5 w-100" id="formControlLg" type="email" size="md" value={email} onChange={(e) => setEmail(e.target.value)} />
-                                <MDBInput placeholder='Input password' wrapperClass="mb-4 mx-5 w-100" id="formControlLg" type="password" size="md" value={password} onChange={(e) => setPassword(e.target.value)} />
+                                <MDBInput placeholder="Input email" wrapperClass="mb-4 mx-5 w-100" id="formControlLg" type="email" size="md" value={email} onChange={(e) => setEmail(e.target.value)} />
+                                <MDBInput placeholder="Input password" wrapperClass="mb-4 mx-5 w-100" id="formControlLg" type="password" size="md" value={password} onChange={(e) => setPassword(e.target.value)} />
+                                <div style={{ marginLeft: "50px", width: "374px", marginBottom: "20px" }}>
+                                    <Select placeholder="Select Role" defaultValue={1} options={[{ value: "1", label: "ADMIN" }, { value: "2", label: "EMPLOYEE" }]} onChange={e => {
+                                        setRoleID(+e.value)
+                                    }}>
+                                    </Select>
+                                </div>
 
-                                <Button className="mb-4 px-5 mx-5 w-100" colorScheme='yellow' size="md" onClick={handleLogin}>Login</Button>
+                                <Button className="mb-4 px-5 mx-5 w-100" colorScheme="yellow" size="md" onClick={handleLogin}>Login</Button>
 
 
                             </div>

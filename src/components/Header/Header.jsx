@@ -87,6 +87,8 @@ function Header({ setNav }) {
 
     navigate('/admin/login')
     window.location.reload()
+    // localStorage.removeItem("admin");
+    // localStorage.removeItem("employee");
   }
   return (
     <HStack pt="20px" bg="transparent" as="header">
